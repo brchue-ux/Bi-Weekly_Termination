@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Real / not-fully-de-identified data — never commit.
+# See project history: SFDC file was locked to 700 rather than run through the
+# re-identity rewrite (the app+users were removed from scope instead), and
+# .originals/ is the explicit pre-de-identification backup with known leaked names.
+App User Lists/FAKE USERS - SFDC 3rd party user list.xlsx
+App User Lists/.originals/
+
+# Generated run output — regenerable from the scripts + source rosters, not source itself.
+cycles/
+cycles_feed/
+reports/
+test_rosters/
+
+# Operational logs / screenshots, not project content.
+*.log
+pdi_keepalive_failure.png

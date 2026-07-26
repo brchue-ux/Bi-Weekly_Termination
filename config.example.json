@@ -1,0 +1,21 @@
+{
+  "org": "https://your-real-work-org.okta.com",
+  "client_id": "your-api-services-app-client-id",
+  "private_key_file": "/home/YOURUSER/.secrets/okta_term_revamp_private.pem",
+  "kid": "term-revamp-key-1",
+  "scopes": ["okta.apps.read", "okta.apps.manage", "okta.users.read"],
+  "roster_dir": "/home/YOURUSER/projects/termination_revamp_v1/work_rosters",
+  "column": "UPN",
+  "apps": [
+    { "label": "Diligent (Bi-Weekly Term Test)", "export": "Diligent.csv" },
+    { "label": "Docusign (Bi-Weekly Term Test)", "export": "Docusign.csv" },
+    { "label": "Dynamics AX NA (Bi-Weekly Term Test)", "export": "Dynamics_AX_NA.csv" },
+    { "label": "Dynamics AX UK (Bi-Weekly Term Test)", "export": "Dynamics_AX_UK.csv" },
+    { "label": "Efax (Bi-Weekly Term Test)", "export": "Efax.csv" },
+    { "label": "SFDC RWCS 3rd Party (Bi-Weekly Term Test)", "export": "SFDC_RWCS_3rd_Party.csv" },
+    { "label": "SFDC RWCS CAN (Bi-Weekly Term Test)", "export": "SFDC_RWCS_CAN.csv" },
+    { "label": "SFDC SID EMEA (Bi-Weekly Term Test)", "export": "SFDC_SID_EMEA.csv" },
+    { "label": "Steriworks NA (Bi-Weekly Term Test)", "export": "Steriworks_NA.csv" },
+    { "label": "Steriworks UK (Bi-Weekly Term Test)", "export": "Steriworks_UK.csv" }
+  ]
+}

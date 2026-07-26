@@ -1,0 +1,161 @@
+[
+ {
+  "tab": "CloudForce Canada",
+  "label": "BiTerm OIG - CloudForce Canada",
+  "slug": "cloudforcecanada",
+  "app_id": "0oa15l0monme7hReR698",
+  "app_name": "demo-beige-haddock-4684_bitermoigcloudforcecanada_1",
+  "drop": "bi-weekly term and app list/CloudForce Canada/CloudForce_Canada_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "CloudForce HQ",
+  "label": "BiTerm OIG - CloudForce HQ",
+  "slug": "cloudforcehq",
+  "app_id": "0oa15l0o3tgfaoZUF698",
+  "app_name": "demo-beige-haddock-4684_bitermoigcloudforcehq_1",
+  "drop": "bi-weekly term and app list/CloudForce HQ/CloudForce_HQ_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Apollo",
+  "label": "BiTerm OIG - NA Apollo",
+  "slug": "naapollo",
+  "app_id": "0oa15l0p4n1TvdEyy698",
+  "app_name": "demo-beige-haddock-4684_bitermoignaapollo_1",
+  "drop": "bi-weekly term and app list/NA Apollo/NA_Apollo_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Orion",
+  "label": "BiTerm OIG - NA Orion",
+  "slug": "naorion",
+  "app_id": "0oa15l0m1ehwSx07G698",
+  "app_name": "demo-beige-haddock-4684_bitermoignaorion_1",
+  "drop": "bi-weekly term and app list/NA Orion/NA_Orion_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Saturn Central",
+  "label": "BiTerm OIG - NA Saturn Central",
+  "slug": "nasaturncentral",
+  "app_id": "0oa15l0muoxoVRKsW698",
+  "app_name": "demo-beige-haddock-4684_bitermoignasaturncentral_1",
+  "drop": "bi-weekly term and app list/NA Saturn Central/NA_Saturn_Central_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Saturn Corp",
+  "label": "BiTerm OIG - NA Saturn Corp",
+  "slug": "nasaturncorp",
+  "app_id": "0oa15l0mwa9jOs9h8698",
+  "app_name": "demo-beige-haddock-4684_bitermoignasaturncorp_1",
+  "drop": "bi-weekly term and app list/NA Saturn Corp/NA_Saturn_Corp_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Saturn East",
+  "label": "BiTerm OIG - NA Saturn East",
+  "slug": "nasaturneast",
+  "app_id": "0oa15l0lt007VM8Si698",
+  "app_name": "demo-beige-haddock-4684_bitermoignasaturneast_1",
+  "drop": "bi-weekly term and app list/NA Saturn East/NA_Saturn_East_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Saturn West",
+  "label": "BiTerm OIG - NA Saturn West",
+  "slug": "nasaturnwest",
+  "app_id": "0oa15l0o9a3TTqD6W698",
+  "app_name": "demo-beige-haddock-4684_bitermoignasaturnwest_1",
+  "drop": "bi-weekly term and app list/NA Saturn West/NA_Saturn_West_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Stellar",
+  "label": "BiTerm OIG - NA Stellar",
+  "slug": "nastellar",
+  "app_id": "0oa15l0m4hwk4ooOl698",
+  "app_name": "demo-beige-haddock-4684_bitermoignastellar_1",
+  "drop": "bi-weekly term and app list/NA Stellar/NA_Stellar_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "NONE"
+ },
+ {
+  "tab": "NA Saturn ComSat",
+  "label": "BiTerm OIG - NA Saturn ComSat",
+  "slug": "nasaturncomsat",
+  "app_id": "0oa15k4h5x3yZneqN698",
+  "app_name": "demo-beige-haddock-4684_bitermoignasaturncomsat_1",
+  "drop": "bi-weekly term and app list/NA Saturn ComSat/NA_Saturn_ComSat_users_20260723.csv",
+  "roles": [
+   "Administrator",
+   "Power User",
+   "Read Only",
+   "Service Account",
+   "Standard User"
+  ],
+  "emOptInStatus": "ENABLED"
+ }
+]

@@ -1,0 +1,33 @@
+account_id,display_name,email,account_status,app_role,privileged,created_date,last_login_date
+AMAIA.KOWALSKI,Amaia Kowalski,Amaia.Kowalski@BiTermTest.com,Enabled,Read Only,No,2020-08-31,2026-07-09
+NAYELI.PETROV,Nayeli Petrov,Nayeli.Petrov@BiTermTest.com,Enabled,Read Only,No,2020-08-17,2026-06-15
+CFUJIMOTO,Cem Fujimoto,Cem.Fujimoto@BiTermTest.com,Enabled,Read Only,No,2013-01-28,2026-07-04
+MAIALEN.OWUSU,Maialen Owusu,Maialen.Owusu@BiTermTest.com,Enabled,Standard User,No,2023-01-09,2026-07-22
+PARVIN.KOZLOWSKI,Parvin Kozlowski,Parvin.Kozlowski@BiTermTest.com,Enabled,Standard User,No,2017-04-03,2026-06-27
+KENJI.PHAM,Kenji Pham,Kenji.Pham@BiTermTest.com,Enabled,Standard User,No,2021-07-26,2026-06-30
+FEMI.FOFANA,Femi Fofana,Femi.Fofana@BiTermTest.com,Disabled,Standard User,No,2020-07-20,2026-07-09
+DUC.MULDER,Duc Mulder,Duc.Mulder@BiTermTest.com,Enabled,Standard User,No,2011-03-28,2026-06-14
+BUCHIDA,Basim Uchida,Basim.Uchida@BiTermTest.com,Enabled,Standard User,No,2010-04-12,2026-06-30
+SIPHO.HORVAT,Sipho Horvat,Sipho.Horvat@BiTermTest.com,Enabled,Standard User,No,2024-08-12,2026-07-14
+OFARRUGIA,Oksana Farrugia,Oksana.Farrugia@BiTermTest.com,Enabled,Standard User,No,2005-08-15,2026-07-01
+AVISSER,Aylin Visser,Aylin.Visser@BiTermTest.com,Enabled,Standard User,No,2004-12-01,2026-06-13
+RHAILE,Rafael Haile,Rafael.Haile@BiTermTest.com,Enabled,Standard User,No,2001-01-29,2026-07-08
+SULEIMAN.ZIELINSKI,Suleiman Zielinski,Suleiman.Zielinski@BiTermTest.com,Enabled,Administrator,Yes,2018-07-02,2026-07-16
+YUSUF.BAE,Yusuf Bae,Yusuf.Bae@BiTermTest.com,Enabled,Power User,No,2018-03-19,2026-06-13
+PARVIN.TRUONG,Parvin Truong,Parvin.Truong@BiTermTest.com,Enabled,Standard User,No,2015-10-05,2026-07-03
+TARIQ.RIBEIRO,Tariq Ribeiro,Tariq.Ribeiro@BiTermTest.com,Enabled,Read Only,No,2015-04-06,2026-07-03
+NIAMH.OWUSU,Niamh Owusu,Niamh.Owusu@BiTermTest.com,Enabled,Standard User,No,2015-02-23,2026-07-15
+MBANERJEE,Mateo Banerjee,Mateo.Banerjee@BiTermTest.com,Enabled,Standard User,No,2008-12-01,2026-06-09
+JOAO.TRIVEDI,Joao Trivedi,Joao.Trivedi@BiTermTest.com,Enabled,Standard User,No,2015-01-01,2026-06-17
+Baran.Mazur,Baran Mazur,,Enabled,Service Account,Yes,2023-07-25,2026-03-16
+TAHIRA.LUNDGREN,Tahira Lundgren,tahira.lundgren@bitermtest.com,Enabled,Service Account,Yes,2023-12-18,2026-03-23
+Agnieszka.Vuong,Agnieszka Vuong,,Enabled,Standard User,No,2023-08-07,2025-05-06
+INES.YILMAZ,Ines Yilmaz,,Enabled,Service Account,Yes,2023-04-12,2025-08-20
+MAITE.GRECO,Maite Greco,,Enabled,Standard User,No,2021-11-29,2025-07-03
+VOLKAN.ALEMU,Volkan Alemu,volkan.alemu@bitermtest.com,Enabled,Standard User,No,2023-01-25,2024-08-21
+Marisol.Axelsson,Marisol Axelsson,marisol.axelsson@bitermtest.com,Enabled,Standard User,No,2023-03-26,2025-10-15
+Eneko.Sowande,Eneko Sowande,eneko.sowande@bitermtest.com,Disabled,Read Only,No,2023-03-17,2025-02-12
+YASMIN.MEKONNEN,Yasmin Mekonnen,yasmin.mekonnen@bitermtest.com,Enabled,Standard User,No,2023-06-23,2024-08-28
+MINH.MULDER,Minh Mulder,minh.mulder@bitermtest.com,Enabled,Power User,No,2022-05-19,2026-07-05
+DRAGAN.BOATENG,Dragan Boateng,,Enabled,Standard User,No,2022-06-18,2024-03-16
+KAVITA.DOGAN,Kavita Dogan,kavita.dogan@bitermtest.com,Enabled,Service Account,Yes,2022-02-13,2024-04-13

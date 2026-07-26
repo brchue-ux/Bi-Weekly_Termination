@@ -1,0 +1,24 @@
+account_id,display_name,email,account_status,app_role,privileged,created_date,last_login_date
+FRAHAL,Fernanda Rahal,Fernanda.Rahal@BiTermTest.com,Enabled,Read Only,No,2013-01-28,2026-07-20
+GIULIA.KRAWCZYK,Giulia Krawczyk,Giulia.Krawczyk@BiTermTest.com,Disabled,Administrator,Yes,2025-03-12,2026-07-30
+TEODORA.NOWAK,Teodora Nowak,Teodora.Nowak@BiTermTest.com,Enabled,Standard User,No,2025-02-18,2026-07-17
+WHWANG,Wafa Hwang,Wafa.Hwang@BiTermTest.com,Enabled,Standard User,No,2010-07-26,2026-08-01
+ANOUK.MAZUR,Anouk Mazur,Anouk.Mazur@BiTermTest.com,Enabled,Standard User,No,2024-07-08,2026-08-04
+SANJAY.LUNDGREN,Sanjay Lundgren,Sanjay.Lundgren@BiTermTest.com,Enabled,Standard User,No,2024-06-17,2026-07-23
+JJEONG,Jisoo Jeong,Jisoo.Jeong@BiTermTest.com,Enabled,Standard User,No,2006-02-06,2026-07-07
+BNDIAYE,Basim Ndiaye,Basim.Ndiaye@BiTermTest.com,Enabled,Standard User,No,2004-12-13,2026-07-08
+IMEKONNEN,Iker Mekonnen,Iker.Mekonnen@BiTermTest.com,Enabled,Standard User,No,2000-07-31,2026-07-09
+PETRO.NAKAMURA,Petro Nakamura,Petro.Nakamura@BiTermTest.com,Enabled,Standard User,No,2023-02-13,2026-06-29
+ZOFIA.DELUCA,Zofia Deluca,Zofia.Deluca@BiTermTest.com,Enabled,Standard User,No,2022-01-10,2026-06-25
+Baran.Mazur,Baran Mazur,baran.mazur@bitermtest.com,Enabled,Standard User,No,2023-12-16,2026-02-24
+MATEO.MEKONNEN,Mateo Mekonnen,,Enabled,Service Account,Yes,2024-01-03,2025-06-14
+Agnieszka.Vuong,Agnieszka Vuong,agnieszka.vuong@bitermtest.com,Enabled,Standard User,No,2022-08-20,2024-04-10
+FIRUZA.GIRMA,Firuza Girma,,Enabled,Read Only,No,2022-05-23,2024-09-29
+SAKURA.FERREIRA,Sakura Ferreira,sakura.ferreira@bitermtest.com,Enabled,Standard User,No,2022-06-13,2026-07-01
+NAOKO.NDIAYE,Naoko Ndiaye,naoko.ndiaye@bitermtest.com,Enabled,Standard User,No,2023-02-05,2024-10-25
+Marisol.Axelsson,Marisol Axelsson,marisol.axelsson@bitermtest.com,Enabled,Service Account,Yes,2022-01-12,2026-05-07
+Eneko.Sowande,Eneko Sowande,eneko.sowande@bitermtest.com,Enabled,Standard User,No,2022-11-04,2024-04-10
+HUONG.NASSAR,Huong Nassar,,Enabled,Standard User,No,2023-06-18,2026-04-01
+KAMAL.TRAORE,Kamal Traore,kamal.traore@bitermtest.com,Enabled,Standard User,No,2023-10-09,2026-03-01
+ANIKA.HWANG,Anika Hwang,anika.hwang@bitermtest.com,Enabled,Standard User,No,2024-01-03,2025-07-31
+PRIYA.STOJANOVIC,Priya Stojanovic,,Enabled,Service Account,Yes,2023-08-11,2026-06-11

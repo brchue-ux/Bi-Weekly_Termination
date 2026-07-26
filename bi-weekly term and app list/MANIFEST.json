@@ -1,0 +1,381 @@
+{
+  "generated": "2026-07-23",
+  "seed": "biterm-drops-20260723",
+  "cycles": {
+    "2026-07-23": {
+      "NA Apollo": 130,
+      "NA Stellar": 1950,
+      "NA Orion": 1435,
+      "NA Saturn East": 148,
+      "NA Saturn Central": 149,
+      "NA Saturn West": 148,
+      "NA Saturn ComSat": 32,
+      "NA Saturn Corp": 23,
+      "CloudForce HQ": 257,
+      "CloudForce Canada": 132,
+      "_HR": 2035
+    },
+    "2026-08-06": {
+      "NA Apollo": 128,
+      "NA Stellar": 1926,
+      "NA Orion": 1409,
+      "NA Saturn East": 146,
+      "NA Saturn Central": 145,
+      "NA Saturn West": 146,
+      "NA Saturn ComSat": 12,
+      "NA Saturn Corp": 23,
+      "CloudForce HQ": 254,
+      "CloudForce Canada": 132,
+      "_HR": 2035
+    }
+  },
+  "exception_rows": 50,
+  "cases": {
+    "confirmed_termination_with_access": {
+      "count": 64,
+      "distinct_people": 30,
+      "examples": [
+        [
+          "CloudForce Canada",
+          "Tariq.Zielinski.ca@BiTermTest.com",
+          "Tariq.Zielinski@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "Amina.Forsberg.cf@BiTermTest.com",
+          "Amina.Forsberg@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "Sanne.Teixeira.cf@BiTermTest.com",
+          "Sanne.Teixeira@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "dchukwu@meryyhikle.force.com",
+          "Kamal.Nassar@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "isleiman@wm.com",
+          "Trung.Abebe@BiTermTest.com"
+        ],
+        [
+          "NA Apollo",
+          "Lorenzo.Bekele",
+          "Lorenzo.Bekele@BiTermTest.com"
+        ],
+        [
+          "NA Apollo",
+          "Rashida.Lundgren",
+          "Rashida.Lundgren@BiTermTest.com"
+        ],
+        [
+          "NA Orion",
+          "AMARA.MARKOVIC",
+          "Amara.Markovic@BiTermTest.com"
+        ],
+        [
+          "NA Orion",
+          "ANAHI.VANDENBERG",
+          "Anahi.Vandenberg@BiTermTest.com"
+        ],
+        [
+          "NA Orion",
+          "ANIKA.NAKAMURA",
+          "Anika.Nakamura@BiTermTest.com"
+        ]
+      ]
+    },
+    "terminated_and_privileged": {
+      "count": 5,
+      "examples": [
+        [
+          "NA Apollo",
+          "Rashida.Lundgren"
+        ],
+        [
+          "NA Orion",
+          "CFONSECA"
+        ],
+        [
+          "NA Orion",
+          "Sanne.Teixeira"
+        ],
+        [
+          "NA Saturn Central",
+          "ROISIN.FERRARI"
+        ],
+        [
+          "NA Stellar",
+          "NUCHIDA"
+        ]
+      ]
+    },
+    "login_after_termination_date": {
+      "count": 4,
+      "examples": [
+        [
+          "NA Orion",
+          "BMENSAH",
+          "2026-03-23",
+          "2026-07-10"
+        ],
+        [
+          "NA Orion",
+          "MAHMOUD.TEIXEIRA",
+          "2026-03-23",
+          "2026-03-26"
+        ],
+        [
+          "NA Stellar",
+          "NUCHIDA",
+          "2026-03-23",
+          "2026-06-28"
+        ],
+        [
+          "NA Stellar",
+          "THIAGO.BARAKA",
+          "2026-03-23",
+          "2026-03-25"
+        ]
+      ]
+    },
+    "orphan_not_in_hr": {
+      "count": 408,
+      "examples": [
+        [
+          "NA Apollo",
+          "DABEBE"
+        ],
+        [
+          "NA Apollo",
+          "Femke.Almeida"
+        ],
+        [
+          "NA Apollo",
+          "Rafael.Galea"
+        ],
+        [
+          "NA Apollo",
+          "Thabo.Afolabi"
+        ],
+        [
+          "NA Apollo",
+          "EMEHTA"
+        ],
+        [
+          "NA Apollo",
+          "Firuza.Bae"
+        ],
+        [
+          "NA Apollo",
+          "Tomasz.Camilleri"
+        ],
+        [
+          "NA Apollo",
+          "Yevhen.Lindqvist"
+        ],
+        [
+          "NA Apollo",
+          "Fernanda.Diallo"
+        ],
+        [
+          "NA Apollo",
+          "Gorka.Celik"
+        ]
+      ]
+    },
+    "app_row_unjoinable_blank_email": {
+      "count": 207,
+      "examples": [
+        [
+          "NA Apollo",
+          "Femke.Almeida"
+        ],
+        [
+          "NA Apollo",
+          "Rafael.Galea"
+        ],
+        [
+          "NA Apollo",
+          "EMEHTA"
+        ],
+        [
+          "NA Apollo",
+          "Firuza.Bae"
+        ],
+        [
+          "NA Apollo",
+          "Tomasz.Camilleri"
+        ],
+        [
+          "NA Apollo",
+          "Yevhen.Lindqvist"
+        ],
+        [
+          "NA Apollo",
+          "Fernanda.Diallo"
+        ],
+        [
+          "NA Apollo",
+          "Gorka.Celik"
+        ],
+        [
+          "NA Apollo",
+          "Parvin.Mekonnen"
+        ],
+        [
+          "NA Apollo",
+          "Beatriz.Abebe"
+        ]
+      ]
+    },
+    "hr_malformed_status": {
+      "count": 30,
+      "examples": [
+        "Renata.Djordjevic@BiTermTest.com",
+        "Minho.Deluca@BiTermTest.com",
+        "Kavita.Worku@BiTermTest.com",
+        "Daan.Sahin@BiTermTest.com",
+        "Zofia.Kirigaya@BiTermTest.com",
+        "Trung.Petrovic@BiTermTest.com",
+        "Yuki.Aksoy@BiTermTest.com",
+        "Gita.Vella@BiTermTest.com",
+        "Minh.Lewandowski@BiTermTest.com",
+        "Yaretzi.Stojanovic@BiTermTest.com"
+      ]
+    },
+    "contractor_worker_type": {
+      "count": 209,
+      "examples": [
+        "Eshan.Farrugia@BiTermTest.com",
+        "Baran.Carvalho@BiTermTest.com",
+        "Amina.Meijer@BiTermTest.com",
+        "Xochitl.Alemu@BiTermTest.com",
+        "ZDeshpande@BiTermTest.com"
+      ]
+    },
+    "cycle2_verified_closure": {
+      "count": 51,
+      "examples": [
+        [
+          "CloudForce HQ",
+          "Sanne.Teixeira.cf@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "dchukwu@meryyhikle.force.com"
+        ],
+        [
+          "CloudForce HQ",
+          "isleiman@wm.com"
+        ],
+        [
+          "NA Apollo",
+          "Lorenzo.Bekele"
+        ],
+        [
+          "NA Apollo",
+          "Rashida.Lundgren"
+        ],
+        [
+          "NA Orion",
+          "AMARA.MARKOVIC"
+        ],
+        [
+          "NA Orion",
+          "ANAHI.VANDENBERG"
+        ],
+        [
+          "NA Orion",
+          "AOZTURK"
+        ],
+        [
+          "NA Orion",
+          "Amara.Markovic"
+        ],
+        [
+          "NA Orion",
+          "Amina.Forsberg"
+        ]
+      ]
+    },
+    "cycle2_false_claim_still_present": {
+      "count": 2,
+      "examples": [
+        [
+          "CloudForce Canada",
+          "Tariq.Zielinski.ca@BiTermTest.com"
+        ],
+        [
+          "CloudForce HQ",
+          "Amina.Forsberg.cf@BiTermTest.com"
+        ]
+      ]
+    },
+    "cycle2_aging_not_yet_remediated": {
+      "count": 11,
+      "examples": [
+        [
+          "NA Orion",
+          "ANIKA.NAKAMURA"
+        ],
+        [
+          "NA Orion",
+          "LORENZO.BEKELE"
+        ],
+        [
+          "NA Orion",
+          "TAHIRA.VELLA"
+        ],
+        [
+          "NA Saturn East",
+          "TRUNG.ABEBE"
+        ],
+        [
+          "NA Saturn West",
+          "ANAHI.VANDENBERG"
+        ],
+        [
+          "NA Saturn West",
+          "BOGDAN.MENSAH"
+        ],
+        [
+          "NA Stellar",
+          "EKRAWCZYK"
+        ],
+        [
+          "NA Stellar",
+          "SBARONE"
+        ],
+        [
+          "NA Stellar",
+          "SEDA.BARONE"
+        ],
+        [
+          "NA Stellar",
+          "TARIQ.ZIELINSKI"
+        ]
+      ]
+    },
+    "cycle2_new_termination": {
+      "count": 8,
+      "examples": [
+        "Chidi.Traore@BiTermTest.com",
+        "Sipho.Ivanov@BiTermTest.com",
+        "Kofi.Bosman@BiTermTest.com",
+        "Ines.Mifsud@BiTermTest.com",
+        "Vasil.Asante@BiTermTest.com",
+        "Ines.Zammit@BiTermTest.com",
+        "Minho.Micallef@BiTermTest.com",
+        "Huong.Nwosu@BiTermTest.com"
+      ]
+    },
+    "cycle2_export_anomaly": {
+      "app": "NA Saturn ComSat",
+      "cycle1_rows": 32,
+      "cycle2_rows": 12
+    }
+  }
+}

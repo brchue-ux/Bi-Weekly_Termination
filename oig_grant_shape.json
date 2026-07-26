@@ -1,0 +1,22 @@
+{
+ "grantType": "CUSTOM",
+ "target": {
+  "externalId": "0oa15k4h5x3yZneqN698",
+  "type": "APPLICATION"
+ },
+ "targetPrincipal": {
+  "externalId": "00u15i716j6KLz3tK698",
+  "type": "OKTA_USER"
+ },
+ "action": "ALLOW",
+ "entitlements": [
+  {
+   "id": "esp119gd9dqVhRIdA697",
+   "values": [
+    {
+     "id": "ent119gd9fHMfJKVB697"
+    }
+   ]
+  }
+ ]
+}

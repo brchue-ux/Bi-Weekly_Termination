@@ -1,0 +1,79 @@
+{
+ "parentResourceOrn": "orn:okta:idp:00o159zwmhz6L5eo4698:apps:demo-beige-haddock-4684_bitermoignasaturncomsat_1:0oa15k4h5x3yZneqN698",
+ "parent": {
+  "externalId": "0oa15k4h5x3yZneqN698",
+  "type": "APPLICATION"
+ },
+ "values": [
+  {
+   "id": "ent119gd9edGTRNY2697",
+   "name": "Standard User",
+   "externalValue": "standard_user",
+   "orn": "orn:okta:governance:00o159zwmhz6L5eo4698:entitlement-values:ent119gd9edGTRNY2697",
+   "createdBy": "00u15ekemr3Fe5n2a698",
+   "created": "2026-07-24T01:27:40Z",
+   "lastUpdated": "2026-07-24T01:27:40Z",
+   "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+  },
+  {
+   "id": "ent119gd9fHMfJKVB697",
+   "name": "Read Only",
+   "externalValue": "read_only",
+   "orn": "orn:okta:governance:00o159zwmhz6L5eo4698:entitlement-values:ent119gd9fHMfJKVB697",
+   "createdBy": "00u15ekemr3Fe5n2a698",
+   "created": "2026-07-24T01:27:40Z",
+   "lastUpdated": "2026-07-24T01:27:40Z",
+   "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+  },
+  {
+   "id": "ent119gd9g0Z1PeN2697",
+   "name": "Power User",
+   "externalValue": "power_user",
+   "orn": "orn:okta:governance:00o159zwmhz6L5eo4698:entitlement-values:ent119gd9g0Z1PeN2697",
+   "createdBy": "00u15ekemr3Fe5n2a698",
+   "created": "2026-07-24T01:27:40Z",
+   "lastUpdated": "2026-07-24T01:27:40Z",
+   "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+  },
+  {
+   "id": "ent119gd9h1SukIXe697",
+   "name": "Administrator",
+   "externalValue": "administrator",
+   "orn": "orn:okta:governance:00o159zwmhz6L5eo4698:entitlement-values:ent119gd9h1SukIXe697",
+   "createdBy": "00u15ekemr3Fe5n2a698",
+   "created": "2026-07-24T01:27:40Z",
+   "lastUpdated": "2026-07-24T01:27:40Z",
+   "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+  },
+  {
+   "id": "ent119gd9i25PHZ9x697",
+   "name": "Service Account",
+   "externalValue": "service_account",
+   "orn": "orn:okta:governance:00o159zwmhz6L5eo4698:entitlement-values:ent119gd9i25PHZ9x697",
+   "createdBy": "00u15ekemr3Fe5n2a698",
+   "created": "2026-07-24T01:27:40Z",
+   "lastUpdated": "2026-07-24T01:27:40Z",
+   "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+  }
+ ],
+ "_links": {
+  "self": {
+   "href": "https://demo-beige-haddock-4684.okta.com/governance/api/v1/entitlements/esp119gd9dqVhRIdA697",
+   "hints": {}
+  }
+ },
+ "metadata": {
+  "total": 5
+ },
+ "id": "esp119gd9dqVhRIdA697",
+ "name": "Role",
+ "externalValue": "role",
+ "description": "App role held in NA Saturn ComSat",
+ "multiValue": false,
+ "required": false,
+ "dataType": "string",
+ "createdBy": "00u15ekemr3Fe5n2a698",
+ "created": "2026-07-24T01:27:40.786Z",
+ "lastUpdated": "2026-07-24T01:27:40.786Z",
+ "lastUpdatedBy": "00u15ekemr3Fe5n2a698"
+}

@@ -1,0 +1,51 @@
+application,name,upn,employee_id,app_account_alias,exception_type,justification,owner_upn,expiry
+NA Apollo,Hana Baraka,hana.baraka@bitermtest.com,33199,Hana.Baraka,Break-glass,IT team standing access - biweekly review exemption,eamon.zielinski@bitermtest.com,2026-06-30
+NA Apollo,Anouk Sokolov,anouk.sokolov@bitermtest.com,73044595,Anouk.Sokolov,IT Admin,IT team standing access - biweekly review exemption,ren.aslan@bitermtest.com,2026-01-15
+NA Apollo,Volkan Chatterjee,volkan.chatterjee@bitermtest.com,73036936,Volkan.Chatterjee,IT Admin,IT team standing access - biweekly review exemption,hana.baraka@bitermtest.com,2026-12-31
+NA Stellar,Tariq Zielinski,tariq.zielinski@bitermtest.com,73055087,TARIQ.ZIELINSKI,IT Admin,IT team standing access - biweekly review exemption,ximena.iyer@bitermtest.com,2026-12-31
+NA Stellar,Ren Aslan,ren.aslan@bitermtest.com,73055731,REN.ASLAN,IT Admin,IT team standing access - biweekly review exemption,tariq.zielinski@bitermtest.com,2026-12-31
+NA Stellar,Ximena Cassar,ximena.cassar@bitermtest.com,10007258,XIMENA.CASSAR,IT Admin,IT team standing access - biweekly review exemption,ximena.iyer@bitermtest.com,2026-06-30
+NA Stellar,Yusuf Novak,yusuf.novak@bitermtest.com,73047336,YUSUF.NOVAK,Break-glass,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2026-01-15
+NA Stellar,Anouk Sokolov,anouk.sokolov@bitermtest.com,26464,ASOKOLOV,Break-glass,IT team standing access - biweekly review exemption,tariq.zielinski@bitermtest.com,2026-01-15
+NA Stellar,Zahra Nikolic,zahra.nikolic@bitermtest.com,73044902,ZAHRA.NIKOLIC,IT Admin,IT team standing access - biweekly review exemption,eamon.zielinski@bitermtest.com,2026-12-31
+NA Orion,Deniz Ghanem,dghanem2@bitermtest.com,22597,DGHANEM,Break-glass,IT team standing access - biweekly review exemption,eamon.zielinski@bitermtest.com,2026-01-15
+NA Orion,Hana Baraka,hana.baraka@bitermtest.com,41087,Hana.Baraka,Service Owner,IT team standing access - biweekly review exemption,anouk.sokolov@bitermtest.com,2026-12-31
+NA Orion,Ren Aslan,ren.aslan@bitermtest.com,35595,REN.ASLAN,Service Owner,IT team standing access - biweekly review exemption,niamh.owusu@bitermtest.com,2027-06-30
+NA Orion,Ximena Iyer,ximena.iyer@bitermtest.com,23286,XIYER,Service Owner,IT team standing access - biweekly review exemption,ainhoa.chopra@bitermtest.com,2026-06-30
+NA Orion,Beatriz Meijer,beatriz.meijer@bitermtest.com,73051703,BEATRIZ.MEIJER,IT Admin,IT team standing access - biweekly review exemption,ainhoa.chopra@bitermtest.com,2026-12-31
+NA Orion,Ximena Cassar,ximena.cassar@bitermtest.com,24853,Ximena.Cassar,IT Admin,IT team standing access - biweekly review exemption,hana.baraka@bitermtest.com,2026-06-30
+NA Orion,Eamon Zielinski,eamon.zielinski@bitermtest.com,27118,EZIELINSKI,Break-glass,IT team standing access - biweekly review exemption,volkan.chatterjee@bitermtest.com,2026-12-31
+NA Orion,Anouk Sokolov,anouk.sokolov@bitermtest.com,20084,ANOUK.SOKOLOV,IT Admin,IT team standing access - biweekly review exemption,ainhoa.chopra@bitermtest.com,2026-01-15
+NA Orion,Volkan Chatterjee,volkan.chatterjee@bitermtest.com,73037934,Volkan.Chatterjee,IT Admin,IT team standing access - biweekly review exemption,beatriz.meijer@bitermtest.com,2026-12-31
+NA Orion,Zahra Nikolic,zahra.nikolic@bitermtest.com,19887,ZAHRA.NIKOLIC,IT Admin,IT team standing access - biweekly review exemption,volkan.chatterjee@bitermtest.com,2026-01-15
+NA Saturn East,Deniz Ghanem,dghanem2@bitermtest.com,22597,DGHANEM,IT Admin,IT team standing access - biweekly review exemption,volkan.chatterjee@bitermtest.com,2026-12-31
+NA Saturn East,Hana Baraka,hana.baraka@bitermtest.com,21451,HBARAKA,Service Owner,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2027-06-30
+NA Saturn East,Ren Aslan,ren.aslan@bitermtest.com,42333,REN.ASLAN,Service Owner,IT team standing access - biweekly review exemption,eamon.zielinski@bitermtest.com,2026-12-31
+NA Saturn East,Ximena Iyer,ximena.iyer@bitermtest.com,29878,XIMENA.IYER,IT Admin,IT team standing access - biweekly review exemption,beatriz.meijer@bitermtest.com,2026-01-15
+NA Saturn East,Basim Uchida,basim.uchida@bitermtest.com,73008405,BASIM.UCHIDA,IT Admin,IT team standing access - biweekly review exemption,dghanem2@bitermtest.com,2026-06-30
+NA Saturn East,Anouk Sokolov,anouk.sokolov@bitermtest.com,21944,ASOKOLOV,Service Owner,IT team standing access - biweekly review exemption,ren.aslan@bitermtest.com,2027-06-30
+NA Saturn East,Niamh Owusu,niamh.owusu@bitermtest.com,19590,NOWUSU,IT Admin,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2026-12-31
+NA Saturn East,Ainhoa Chopra,ainhoa.chopra@bitermtest.com,26477,AINHOA.CHOPRA,IT Admin,IT team standing access - biweekly review exemption,eamon.zielinski@bitermtest.com,2026-01-15
+NA Saturn Central,Deniz Ghanem,dghanem2@bitermtest.com,22597,DGHANEM,IT Admin,IT team standing access - biweekly review exemption,ximena.iyer@bitermtest.com,2026-01-15
+NA Saturn Central,Beatriz Meijer,beatriz.meijer@bitermtest.com,23502,BMEIJER,IT Admin,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2026-12-31
+NA Saturn Central,Eamon Zielinski,eamon.zielinski@bitermtest.com,73005979,EAMON.ZIELINSKI,IT Admin,IT team standing access - biweekly review exemption,beatriz.meijer@bitermtest.com,2026-12-31
+NA Saturn Central,Zahra Nikolic,zahra.nikolic@bitermtest.com,73041475,ZAHRA.NIKOLIC,Service Owner,IT team standing access - biweekly review exemption,ren.aslan@bitermtest.com,2026-12-31
+NA Saturn Central,Ainhoa Chopra,ainhoa.chopra@bitermtest.com,73007730,AINHOA.CHOPRA,IT Admin,IT team standing access - biweekly review exemption,volkan.chatterjee@bitermtest.com,2026-06-30
+NA Saturn West,Deniz Ghanem,dghanem2@bitermtest.com,22597,DGHANEM,Break-glass,IT team standing access - biweekly review exemption,anouk.sokolov@bitermtest.com,2026-12-31
+NA Saturn West,Tariq Zielinski,tariq.zielinski@bitermtest.com,31192,TARIQ.ZIELINSKI,Break-glass,IT team standing access - biweekly review exemption,yusuf.novak@bitermtest.com,2026-12-31
+NA Saturn West,Ren Aslan,ren.aslan@bitermtest.com,73006966,REN.ASLAN,IT Admin,IT team standing access - biweekly review exemption,dghanem2@bitermtest.com,2026-12-31
+NA Saturn West,Beatriz Meijer,beatriz.meijer@bitermtest.com,31928,BEATRIZ.MEIJER,Service Owner,IT team standing access - biweekly review exemption,dghanem2@bitermtest.com,2026-12-31
+NA Saturn West,Ximena Cassar,ximena.cassar@bitermtest.com,21209,XCASSAR,IT Admin,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2026-06-30
+NA Saturn West,Yusuf Novak,yusuf.novak@bitermtest.com,40113,YUSUF.NOVAK,Service Owner,IT team standing access - biweekly review exemption,tariq.zielinski@bitermtest.com,2026-06-30
+NA Saturn West,Niamh Owusu,niamh.owusu@bitermtest.com,27968,NIAMH.OWUSU,IT Admin,IT team standing access - biweekly review exemption,anouk.sokolov@bitermtest.com,2026-12-31
+NA Saturn ComSat,Basim Uchida,basim.uchida@bitermtest.com,22574,BUCHIDA,IT Admin,IT team standing access - biweekly review exemption,hana.baraka@bitermtest.com,2027-06-30
+NA Saturn ComSat,Niamh Owusu,niamh.owusu@bitermtest.com,19887,NIAMH.OWUSU,IT Admin,IT team standing access - biweekly review exemption,yusuf.novak@bitermtest.com,2026-12-31
+CloudForce HQ,Deniz Ghanem,dghanem2@bitermtest.com,22597,Deniz.Ghanem,IT Admin,IT team standing access - biweekly review exemption,tariq.zielinski@bitermtest.com,2026-12-31
+CloudForce HQ,Ximena Iyer,ximena.iyer@bitermtest.com,22347,Ximena.Iyer,IT Admin,IT team standing access - biweekly review exemption,hana.baraka@bitermtest.com,2026-01-15
+CloudForce HQ,Eamon Zielinski,eamon.zielinski@bitermtest.com,25592,Eamon.Zielinski,Service Owner,IT team standing access - biweekly review exemption,ximena.cassar@bitermtest.com,2026-12-31
+CloudForce HQ,Volkan Chatterjee,volkan.chatterjee@bitermtest.com,37954,Volkan.Chatterjee,Break-glass,IT team standing access - biweekly review exemption,niamh.owusu@bitermtest.com,2026-12-31
+CloudForce Canada,Tariq Zielinski,tariq.zielinski@bitermtest.com,33209,Tariq.Zielinski,IT Admin,IT team standing access - biweekly review exemption,volkan.chatterjee@bitermtest.com,2026-12-31
+CloudForce Canada,Ximena Cassar,ximena.cassar@bitermtest.com,13281,Ximena.Cassar,Break-glass,IT team standing access - biweekly review exemption,basim.uchida@bitermtest.com,2027-06-30
+CloudForce Canada,Basim Uchida,basim.uchida@bitermtest.com,10004355,Basim.Uchida,Service Owner,IT team standing access - biweekly review exemption,yusuf.novak@bitermtest.com,2026-06-30
+CloudForce Canada,Yusuf Novak,yusuf.novak@bitermtest.com,73047008,Yusuf.Novak,IT Admin,IT team standing access - biweekly review exemption,ainhoa.chopra@bitermtest.com,2026-12-31
+CloudForce Canada,Zahra Nikolic,zahra.nikolic@bitermtest.com,73043876,Zahra.Nikolic,IT Admin,IT team standing access - biweekly review exemption,beatriz.meijer@bitermtest.com,2026-06-30
