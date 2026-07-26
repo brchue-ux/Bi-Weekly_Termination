@@ -32,7 +32,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 ORG = "https://demo-beige-haddock-4684.okta.com"
 TOKEN_FILE = Path.home() / ".secrets" / "claude_3rd_party.txt"
 MANIFEST = PROJ / "oig_apps.json"

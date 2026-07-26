@@ -18,7 +18,7 @@ from pathlib import Path
 ORG = "https://integrator-2343242.okta.com"
 TOKEN_FILE = str(Path.home() / ".secrets" / "Okta_Dev_ApiToken")
 SYNC_SCRIPT = str(Path(__file__).parent / "okta_bookmark_sync.py")
-ROSTER_DIR = Path(__file__).parent / "test_rosters"
+ROSTER_DIR = Path(__file__).parent.parent / "test_rosters"
 
 ALL_USERS = [
     "test001@example.com", "test002@example.com", "test003@example.com",

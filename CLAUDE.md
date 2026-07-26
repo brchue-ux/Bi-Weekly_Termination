@@ -16,7 +16,7 @@ KILLED partway to fix a real defect. Do NOT just "finish the load" — the loade
 multi-account users. Read this whole block before touching the tenant.**
 
 **Done + verified this session:**
-- `oig_saml_rollout.py` (ran `--apply`): created the 9 remaining apps as custom SAML, label
+- `scripts/oig_saml_rollout.py` (ran `--apply`): created the 9 remaining apps as custom SAML, label
   `BiTerm OIG - <tab>` (never `BiTerm - `, which the recon filter keys on). ComSat pre-existed
   → 10 total. Re-queried live: all 10 SAML + ACTIVE. Manifest in `oig_apps.json`
   (tab→app_id→app_name→drop→roles→emOptInStatus) — source of truth for the OIG tooling.
@@ -57,14 +57,14 @@ multiple accounts / conflicting roles in one app:
 
 **Resume steps (in order):**
 1. Probe the grant/entitlement mutability APIs above on one app; pick Option A or B+.
-2. Rework `oig_load_all.py`: dedupe per principal, AGGREGATE roles per person (set), grant per
+2. Rework `scripts/oig_load_all.py`: dedupe per principal, AGGREGATE roles per person (set), grant per
    the chosen option. It currently does first-row-wins — that is the bug.
-3. Fix `oig_verify_all.py` (written, NEVER RUN — has a latent bug): its coverage check
+3. Fix `scripts/oig_verify_all.py` (written, NEVER RUN — has a latent bug): its coverage check
    `len(expected_distinct_uids) + orphan_ROWS == len(rows)` is WRONG with duplicates, and its
    role check compares a single value, not a set. Rework to compare role SETS per principal.
 4. Clean up the 2,072 partial single-value grants + entitlements per the chosen path, then reload
-   cleanly and get `oig_verify_all.py` → VERDICT PASS on all 10 (prove it can fail first).
-5. Build campaigns: `oig_build_campaigns.py` (written, NEVER RUN). Creates-but-NEVER-launches the
+   cleanly and get `scripts/oig_verify_all.py` → VERDICT PASS on all 10 (prove it can fail first).
+5. Build campaigns: `scripts/oig_build_campaigns.py` (written, NEVER RUN). Creates-but-NEVER-launches the
    3 archetypes (per-app entitlement cert ×10, Quarterly UAR over all 10, Flagged-Population user
    campaign from latest cycle), reviewers = AM team Zyler/Phil (NOT bchue@wm.com — off-limits),
    dormant SCHEDULED with a +365d start, both entitlement flags set, remediation NO_ACTION. Run
@@ -118,19 +118,19 @@ pulls, ending in a single `VERDICT: PASS|FAIL` line. Quote that run's output whe
 - OAuth service app "BiTerm Detective Control - Service" (`0oa15jbaw6sllCbVB698`),
   private_key_jwt, key `~/.secrets/term_revamp_oauth_demo_private.pem`. Effective permission =
   granted scopes ∩ admin roles on the client principal (two-layer least privilege — a prod
-  access request must ask for both). `okta_client.py` backs `biweekly_recon.py` /
-  `campaign_report.py`; `seed_tenant.py` deliberately stays SSWS (privileged scaffolding, not
+  access request must ask for both). `scripts/okta_client.py` backs `scripts/biweekly_recon.py` /
+  `scripts/campaign_report.py`; `scripts/seed_tenant.py` deliberately stays SSWS (privileged scaffolding, not
   the control).
 - ServiceNow: `dev336362.service-now.com`, integration user `biterm.termination` (itil + admin),
   creds `~/.secrets/Service Now.txt`. AM team login shared file:
   `~/.secrets/am_team_demo_logins.txt`.
 - **PDI reclaim: 10 days of inactivity WIPES the instance (factory reset).** Only an interactive
-  login resets the clock — API activity does NOT. Weekly keepalive: `pdi_keepalive.py` via
+  login resets the clock — API activity does NOT. Weekly keepalive: `scripts/pdi_keepalive.py` via
   systemd user timer (`pdi-keepalive.timer`, Mon 09:00); ANY failure pushes to ntfy.sh
   (`biterm-pdi-ea3c383b70d9`). Backstop: ServiceNow's own 10-day warning email.
-- Data: `App User Lists/` (real de-identified rosters; `openpyxl` NOT installed — `xlsx_min.py`
+- Data: `App User Lists/` (real de-identified rosters; `openpyxl` NOT installed — `scripts/xlsx_min.py`
   parses xlsx as zip+XML). Users fully re-identified (no source names survive as pairings —
-  `verify_reidentity_tenant.py` → PASS). **`bchue@wm.com` is the user's own account, PERMANENTLY
+  `scripts/verify_reidentity_tenant.py` → PASS). **`bchue@wm.com` is the user's own account, PERMANENTLY
   OFF-LIMITS.**
 
 ## API gotchas (OIG entitlements) — needed for the resume work
@@ -158,12 +158,12 @@ Full API-fact list, campaign body schemas, and every proof run: `CHANGELOG.md`.
 
 ## Code state
 
-- `okta_bookmark_sync.py` — **known bug: parse_xlsx reads only `sheet1.xml`**, silently empty for
-  9 of 10 STARS tabs. Fix before trusting anything downstream (superseded by `xlsx_min.py` for
+- `scripts/okta_bookmark_sync.py` — **known bug: parse_xlsx reads only `sheet1.xml`**, silently empty for
+  9 of 10 STARS tabs. Fix before trusting anything downstream (superseded by `scripts/xlsx_min.py` for
   new work).
-- `run_all.py` — config-driven runner; real-tenant runs are executed by the user, not Claude
+- `scripts/run_all.py` — config-driven runner; real-tenant runs are executed by the user, not Claude
   (build/test in sandbox only, user runs against real data).
-- `bulk_bookmark_rollout.py` — obsolete (dead sandbox), safe to ignore.
+- `scripts/bulk_bookmark_rollout.py` — obsolete (dead sandbox), safe to ignore.
 - `UNMATCHED_TRIAGE_PLAN.md` — triage design, plan only.
 
 ## Open questions

@@ -21,8 +21,8 @@ from pathlib import Path
 INSTANCE = "https://dev336362.service-now.com"
 CREDS = Path.home() / ".secrets" / "sn_dev_portal_login.txt"
 NTFY_TOPIC = "biterm-pdi-ea3c383b70d9"
-LOG = Path(__file__).parent / "pdi_keepalive.log"
-SHOT = Path(__file__).parent / "pdi_keepalive_failure.png"
+LOG = Path(__file__).parent.parent / "pdi_keepalive.log"
+SHOT = Path(__file__).parent.parent / "pdi_keepalive_failure.png"
 
 
 def log(msg):

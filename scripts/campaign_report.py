@@ -20,7 +20,7 @@ from pathlib import Path
 from okta_client import api, paged  # OAuth service app (least privilege), NOT seed_tenant's SSWS
 from xlsx_write import write_xlsx
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 REPORTS = PROJ / "reports"
 CAMPAIGN_PREFIX = "BiTerm — "  # every campaign this suite owns
 

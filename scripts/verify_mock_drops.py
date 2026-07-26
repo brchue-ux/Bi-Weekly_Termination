@@ -18,7 +18,7 @@ import json
 import sys
 from pathlib import Path
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 OUT = PROJ / "bi-weekly term and app list"
 STAMP1, STAMP2 = "20260723", "20260806"
 LEGIT = {"Active", "Paid Leave", "Unpaid Leave"}

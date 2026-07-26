@@ -16,7 +16,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 ORG = "https://demo-beige-haddock-4684.okta.com"
 ORGID = "00o159zwmhz6L5eo4698"
 DROP = PROJ / "bi-weekly term and app list" / "NA Saturn ComSat" / "NA_Saturn_ComSat_users_20260723.csv"

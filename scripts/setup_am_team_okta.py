@@ -33,7 +33,7 @@ TOKEN = (Path.home() / ".secrets" / "claude_3rd_party.txt").read_text().strip()
 DOMAIN = "bitermtest.com"
 GROUP = "Access Management"
 FLAGGED_CAMPAIGN = "ici118cvovgsMIX25697"
-OUT = Path(__file__).parent / "am_team_okta.json"
+OUT = Path(__file__).parent.parent / "am_team_okta.json"
 # Shared demo logins (same password per person in Okta + ServiceNow). In ~/.secrets
 # (not the LAN share) per credential-handling rule; user will simplify the passwords.
 CREDS_FILE = Path.home() / ".secrets" / "am_team_demo_logins.txt"

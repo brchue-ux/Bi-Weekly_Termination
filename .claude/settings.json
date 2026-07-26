@@ -1,12 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 verify_mock_drops.py)",
-      "Bash(python3 reidentity_verify.py)",
-      "Bash(python3 verify_oig_pilot.py)",
-      "Bash(python3 verify_oauth.py)",
-      "Bash(python3 verify_reidentity_tenant.py)",
-      "Bash(python3 smoke_test.py)"
+      "Bash(python3 scripts/verify_mock_drops.py)",
+      "Bash(python3 scripts/reidentity_verify.py)",
+      "Bash(python3 scripts/verify_oig_pilot.py)",
+      "Bash(python3 scripts/verify_oauth.py)",
+      "Bash(python3 scripts/verify_reidentity_tenant.py)",
+      "Bash(python3 scripts/smoke_test.py)"
     ]
   }
 }

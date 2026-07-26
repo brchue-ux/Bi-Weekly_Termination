@@ -27,7 +27,7 @@ from pathlib import Path
 from seed_tenant import STARS_TABS, NO_UPN
 from xlsx_min import load_workbook_rows
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 SRC = PROJ / "App User Lists"
 OUT = PROJ / "bi-weekly term and app list"
 SEED = "biterm-drops-20260723"

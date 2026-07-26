@@ -35,8 +35,8 @@ from xlsx_min import load_workbook_rows
 
 ORG = "https://demo-beige-haddock-4684.okta.com"
 TOKEN_FILE = Path.home() / ".secrets" / "claude_3rd_party.txt"
-BASE = Path(__file__).parent / "App User Lists"
-MANIFEST = Path(__file__).parent / "seed_manifest.json"
+BASE = Path(__file__).parent.parent / "App User Lists"
+MANIFEST = Path(__file__).parent.parent / "seed_manifest.json"
 
 STARS_TABS = ["NA Apollo", "NA Stellar", "NA Orion", "NA Saturn East", "NA Saturn Central",
               "NA Saturn West", "NA Saturn ComSat", "NA Saturn Corp", "CloudForce HQ", "CloudForce Canada"]

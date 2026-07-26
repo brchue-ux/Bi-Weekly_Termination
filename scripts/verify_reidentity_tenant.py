@@ -30,7 +30,7 @@ from reidentity import (BASE, BACKUP, STARS, EXCEPT, MAP_OUT,
                         find_header, identity_columns, valid_email, split_local)
 from okta_client import paged, api
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 SFDC_TOKENS = BASE / ".originals" / "sfdc_name_tokens.json"
 SFDC_APP_ID = "0oa15iclhmjSuXlIa698"
 BCHUE = ("00u15ekemr3Fe5n2a698", "bchue@wm.com", "Brandon", "Chue")

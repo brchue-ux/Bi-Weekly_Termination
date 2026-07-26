@@ -110,7 +110,7 @@ def run_one(org, auth_header, app_cfg, roster_dir, column, apply_):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--config", default=str(Path(__file__).parent / "config.json"))
+    ap.add_argument("--config", default=str(Path(__file__).parent.parent / "config.json"))
     ap.add_argument("--apply", action="store_true", help="actually write; default is dry-run for every app")
     ap.add_argument("--only", help="limit to a single app label from config.json")
     args = ap.parse_args()

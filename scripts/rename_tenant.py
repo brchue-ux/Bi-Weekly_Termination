@@ -32,7 +32,7 @@ from reidentity import MAP_OUT, split_local, mimic_case
 
 ORG = "https://demo-beige-haddock-4684.okta.com"
 TOKEN = (Path.home() / ".secrets" / "claude_3rd_party.txt").read_text().strip()
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 MANIFEST = PROJ / "seed_manifest.json"
 SCRATCH = Path("/tmp/claude-1000/-home-bchue/aed82bac-638b-4d9e-a003-38abeaa2d620/scratchpad")
 DELETED = SCRATCH / "sfdc_removal_done.txt"

@@ -39,7 +39,7 @@ from seed_tenant import APP_LABEL_PREFIX, STARS_TABS, NO_UPN
 from xlsx_min import load_workbook_rows
 from xlsx_write import write_xlsx
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 CYCLES = PROJ / "cycles"
 CYCLES_FEED = PROJ / "cycles_feed"   # unjoined-drop lineage, kept apart from STARS-era state
 SN_INSTANCE = "https://dev336362.service-now.com"

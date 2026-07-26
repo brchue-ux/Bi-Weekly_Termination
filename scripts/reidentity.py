@@ -31,7 +31,7 @@ from pathlib import Path
 from xlsx_min import load_workbook_rows
 from xlsx_write import write_xlsx
 
-BASE = Path(__file__).parent / "App User Lists"
+BASE = Path(__file__).parent.parent / "App User Lists"
 STARS = "FAKE USERS - STARS Report.xlsx"
 EXCEPT = "FAKE USERS - Exception List.xlsx"
 BACKUP = BASE / ".originals" / "pre_reidentity_20260723"

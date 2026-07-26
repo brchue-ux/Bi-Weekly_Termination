@@ -52,7 +52,7 @@ def call(method, path, tolerate=(404,)):
 
 def main():
     ids = set(json.load(open(EXCLUSIVE)))
-    manifest = json.load(open(Path(__file__).parent / "seed_manifest.json"))
+    manifest = json.load(open(Path(__file__).parent.parent / "seed_manifest.json"))
     seeded = {u["id"] for u in manifest["users"].values() if isinstance(u, dict) and u.get("id")}
     strays = ids - seeded
     if strays:

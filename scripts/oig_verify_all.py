@@ -21,7 +21,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-PROJ = Path(__file__).parent
+PROJ = Path(__file__).parent.parent
 ORG = "https://demo-beige-haddock-4684.okta.com"
 ORGID = "00o159zwmhz6L5eo4698"
 TOKEN_FILE = Path.home() / ".secrets" / "claude_3rd_party.txt"
