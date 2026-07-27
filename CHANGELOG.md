@@ -1,5 +1,71 @@
 # termination_revamp_v1
 
+## 2026-07-26 (late, after the hardening pass) — code-volume challenge; adoption risk raised
+
+User pushed back on the hardening pass: *"You created 42 scripts. Seems kind of overkill. How
+much code did you create? How much does this decrease the likelihood that the team would want to
+use it because of how bloated it is for a bi-weekly term process that never had code to begin
+with?"* Measured rather than estimated; numbers now in CLAUDE.md so nobody re-guesses them.
+
+### Premise corrected
+
+I did NOT create 42 scripts — 37 `.py` files were already tracked at HEAD. I created **11 new
+files** (6 shared modules, 5 test files) and rewrote 11 existing ones.
+
+| | Lines |
+|---|---|
+| New shared modules (`biterm_*`, `oig_common`) | 1,133 |
+| New tests | 880 (never ships) |
+| Net change across 11 rewritten files | +1,025 (1,921 added / 896 deleted) |
+| **Total contribution** | **~3,038** |
+
+Repo-wide: 5,960 → 10,871 lines of Python. But that total is the wrong unit:
+
+- **Biweekly control: 11 files / 2,580 lines** (~2,090 excluding comments+blanks).
+  `biweekly_recon.py` went 392 → **712 lines of code** (+320 real logic, +108 doc/comment).
+- **Scaffolding: 35 files / 6,353 lines** — pre-existing OIG/demo/seeding, nobody runs it on a
+  cycle, SCIM retires it.
+- An analyst runs ONE script. A maintainer reads 11 files.
+
+### The inconsistency I owned
+
+CLAUDE.md says, in the user's own framing from the leadership conversation, that the
+reconciliation is *"analyst-owned (Power Query/Power BI or a small script), not a dev project."*
+The 2026-07-26 review was explicitly written to a "senior backend engineer on Okta's OIG team"
+bar — a product-engineering standard applied to something this project's own architecture says
+should not be a dev project. I applied that bar without flagging the mismatch. **Standing rule
+added to CLAUDE.md: the bar for this reconciliation is analyst-ownable, not
+product-engineering-grade.**
+
+Also conceded: parts of what I added are enterprise plumbing a 10-person IAM team may never need
+— `biterm_runlog`'s JSONL change log, `biterm_config`'s env-var coercion, the three-valued
+verdict. Defensible for a SOX control; hard to justify to a team whose current process is a
+vlookup. And 53 files reads as bloat on sight regardless of how the lines split — adoption is
+judged on surface area, which the review pass did not weigh at all.
+
+### Where the pushback does not land
+
+The blocker fixes are small: fail-closed resolution ~15 lines, exact-hostname confirmation 1
+line, date parsing ~40. Roughly 100 lines closed a path where a rate limit deprovisions real
+people and a path where lapsed exceptions silently pass. The 880 test lines do not ship and are
+what let the control's rules be asserted without running a live cycle — the opposite of a burden
+for a team inheriting code it did not write.
+
+### Open decision (NOT actioned — user's call)
+
+Recorded in CLAUDE.md Open questions:
+1. **RECOMMENDED — split `control/` (11 files) from `scaffolding/` (35 files).** Costs nothing,
+   touches no logic, directly addresses what the team sees when they open the repo.
+2. Collapse `biterm_runlog`/`biterm_config` into the control — saves ~250 lines and 2 files,
+   costs the audit artifact.
+3. Question the premise: if the appetite is "the vlookup, but less manual", Power Query + a
+   ~200-line classifier is a legitimate answer and this pass is over-engineered relative to it.
+   An architecture conversation that should have happened BEFORE the review, not after.
+
+Nothing was refactored in response — the decision is the user's, and options (2) and (3) trade
+away capability that was deliberately built.
+
+
 ## 2026-07-26 (late) — Senior-review hardening pass: 8 blockers closed, shared layer, test suite
 
 Acted on every finding in `docs/CODE_REVIEW_2026-07-26.md`. Verified offline: 76 unit tests

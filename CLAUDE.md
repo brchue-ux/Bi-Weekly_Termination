@@ -83,6 +83,18 @@ authorized beyond seeding (biweekly reconciliation pipeline is built + verified,
   is deleted per app, not extended). The reconciliation (today's vlookup, upgraded) is
   analyst-owned (Power Query/Power BI or a small script), not a dev project. **The automation
   footprint SHRINKS as SCIM onboards, it does not grow.**
+- **Measured footprint (2026-07-26, use these numbers — do not estimate):** 53 Python files,
+  10,871 lines total, but that total is the wrong unit. **The biweekly control is 11 files /
+  2,580 lines (~2,090 excluding comments+blanks); `biweekly_recon.py` itself is 712 lines of
+  code.** The other **35 files / 6,353 lines are OIG/demo/seeding scaffolding** — nobody runs
+  them on a cycle and SCIM retires them. Tests are a further 880 lines that never ship. An
+  analyst runs ONE script; a maintainer reads 11 files.
+- **Adoption risk is a first-class constraint, not an afterthought.** The team's current process
+  is a vlookup and they have never owned code. Surface area is what they judge — "53 files" reads
+  as bloat regardless of how the lines split. Before showing this to anyone, decide the repo
+  split (see Open questions). Corollary for future work here: the bar for this reconciliation is
+  *analyst-ownable*, NOT *product-engineering-grade*. The 2026-07-26 review was written to the
+  latter bar, which contradicts this very section — a real inconsistency, recorded in CHANGELOG.
 - **Campaign → real remediation is a config flip, not a rewrite:** the same campaign runner
   carries over to a SCIM-connected app; the one change is `remediationSettings` NO_ACTION →
   actual deprovision, which the connector (not new code) enforces. The verifier is reusable as a
@@ -211,6 +223,17 @@ about the scaffolding, not a licence to hold the control to script standards.
 - Management 2-pager (`docs/BiTerm_Demo_Overview.md`) is DRAFT ONLY — user said "not quite what I
   meant" 2026-07-23; needs a review session on what was off before it's shown to anyone. Don't
   guess at a rewrite.
+- **UNDECIDED — repo split for adoption (raised 2026-07-26, user challenged the code volume).**
+  Three options, no decision yet: (1) **RECOMMENDED** split `control/` (11 files, ~2,000 lines)
+  from `scaffolding/` (35 files) so what the team sees is 11 files — costs nothing, touches no
+  logic; (2) collapse `biterm_runlog`/`biterm_config` into the control, dropping the change-log
+  JSONL and env-var layer — saves ~250 lines, costs the audit artifact; (3) question the premise
+  — if the team's appetite is "the vlookup, but less manual", Power Query + a ~200-line
+  classifier is a legitimate answer and the hardening pass is over-engineered relative to it.
+  (3) is an architecture decision and this file already leans that way; have that conversation
+  before more code is written.
+- **This file is 230+ lines** — past the 150–200 threshold in global CLAUDE.md hygiene. Candidate
+  for a split (standing rules stay; the OIG rollout narrative moves to CHANGELOG).
 
 ## Reference docs (read on demand)
 
