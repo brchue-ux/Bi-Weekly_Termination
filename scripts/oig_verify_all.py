@@ -1,143 +1,266 @@
 #!/usr/bin/env python3
-"""Independent gate on the multi-app OIG load. Trusts nothing the loader reported.
+"""Independent gate on the multi-app OIG load. Trusts nothing the loader REPORTED.
 
-For every app in oig_apps.json it re-derives the truth from the live tenant and the drop CSV and
-checks: app opted into EM · a `Role` entitlement exists with exactly that app's OWN distinct role
-values · every resolvable drop identity has a grant carrying the value the drop specifies · no
-grant exists for anyone absent from the drop · resolvable + orphans == drop rows. Campaigns are
-deliberately out of scope (none are created in this build).
+What "independent" honestly means here (corrected 2026-07-26): this verifier re-reads the
+live tenant and re-derives the expected state from the source drops. It does NOT re-implement
+the derivation — the privilege ordering, the email join and the aggregation live once in
+`oig_common`, imported by both. They used to be copy-pasted into this file, which produced
+two places to fix a bug and the *illusion* of a second opinion: any shared wrong assumption
+passed both checks identically. Where genuine independence matters, the checks below rest on
+facts the loader never computes: row/principal coverage arithmetic, and grants present for
+principals absent from the drop.
 
-Ends in one VERDICT line; exits non-zero on any failure. Proven able to fail: flip a role in a
-drop and the matching check catches it.
+For every app in oig_apps.json it checks:
+  · app opted into EM
+  · a `Role` entitlement exists with exactly that app's OWN distinct role values
+  · every resolvable drop principal carries the HIGHEST-PRIVILEGE role among that person's rows
+    (Administrator > Power User > Standard User > Read Only > Service Account) — this is the
+    load's contract after the highest-wins rework, and the check that catches a hidden privilege
+  · no principal carries a value while being absent from the drop
+  · coverage reconciles: resolvable rows + orphan rows + unknown-role rows == every drop row
 
-Usage: oig_verify_all.py [--only "NA Orion"]
+Duplicate rows are expected (multi-account users), so coverage is counted in ROWS while the grant
+contract is checked per PRINCIPAL — the two must not be conflated (the old check added a
+principal count to a row count and broke on every app with duplicates).
+
+Bare/value-less grants (an app assignment with no entitlement value) cannot be deleted via the
+API, so they are reported as a WARNING, not a failure — they carry no role for a reviewer to
+certify. A value-less grant for someone absent from the drop is called out explicitly.
+
+THREE-VALUED VERDICT (added 2026-07-26). This script previously had NO retry at all while the
+loader retried 429/502/503, and swallowed paging errors with `break`. A rate limit could
+therefore manufacture a verdict: a truncated read produced a spurious FAIL, or an under-read of
+grants hid an `extra`. "I could not evaluate this" is now its own outcome:
+
+    PASS          every check evaluated, every check passed
+    FAIL          every check evaluated, at least one failed
+    INCONCLUSIVE  at least one check could not be evaluated — exits non-zero, names the check
+
+Run `oig_verify_all.py --selftest` to prove the checks actually fail on bad data. The selftest
+corrupts EACH check in turn (it used to corrupt only the expected-role map, proving one check of
+five) and asserts PER APP (it used to sum failures across the run, so one app emitting ten
+failures while nine emitted none still "passed").
+
+Usage: oig_verify_all.py [--only "NA Orion"] [--selftest] [--verbose]
 """
-import csv
-import json
-import re
+import argparse
 import sys
-import urllib.error
-import urllib.parse
-import urllib.request
-from pathlib import Path
 
-PROJ = Path(__file__).parent.parent
-ORG = "https://demo-beige-haddock-4684.okta.com"
-ORGID = "00o159zwmhz6L5eo4698"
-TOKEN_FILE = Path.home() / ".secrets" / "claude_3rd_party.txt"
-MANIFEST = PROJ / "oig_apps.json"
+import biterm_config
+import okta_oauth
+import biterm_creds
+import biterm_domain as domain
+import biterm_http
+import biterm_runlog as runlog
+import oig_common
 
+log = None
 
-def _token():
-    line = TOKEN_FILE.read_text().strip().splitlines()[0].strip()
-    return line.split("=", 1)[1].strip() if "=" in line else line
-
-
-def call(path, ok404=False):
-    req = urllib.request.Request(ORG + path)
-    req.add_header("Authorization", f"SSWS {_token()}")
-    req.add_header("Accept", "application/json")
-    try:
-        with urllib.request.urlopen(req) as resp:
-            raw = resp.read()
-            return resp.status, (json.loads(raw) if raw else {})
-    except urllib.error.HTTPError as e:
-        if e.code == 404 and ok404:
-            return 404, {}
-        return e.code, {}
+# Every check this verifier makes, and the selftest corruption that must trip it. Keeping
+# them in one table is what makes "prove each check is falsifiable" mechanical rather than
+# aspirational.
+CHECKS = ("em_enabled", "entitlement_present", "entitlement_values", "highest_privilege",
+          "no_extra_grants", "row_coverage")
 
 
-def all_users_by_email():
-    emails, url = {}, ORG + "/api/v1/users?limit=200"
-    while url:
-        req = urllib.request.Request(url)
-        req.add_header("Authorization", f"SSWS {_token()}")
-        req.add_header("Accept", "application/json")
-        with urllib.request.urlopen(req) as resp:
-            for u in json.loads(resp.read()):
-                e = (u.get("profile", {}).get("email") or "").strip().lower()
-                if e:
-                    emails[e] = u["id"]
-            url = None
-            for h in resp.headers.get_all("Link") or []:
-                if 'rel="next"' in h:
-                    url = re.search(r"<([^>]+)>", h).group(1)
-    return emails
+class Result:
+    """Per-app outcome: which checks passed, failed, or could not be evaluated."""
 
+    def __init__(self, tab):
+        self.tab = tab
+        self.failures = []       # (check, detail)
+        self.inconclusive = []   # (check, detail)
+        self.warnings = []
+        self.stats = {}
 
-def verify_app(app, emails, failures):
-    tab = app["tab"]
-
-    def chk(label, ok, detail=""):
+    def check(self, name, ok, detail=""):
         if not ok:
-            failures.append(f"FAIL [{tab}] {label}{' — ' + detail if detail else ''}")
+            self.failures.append((name, detail))
         return ok
 
-    code, live = call(f"/api/v1/apps/{app['app_id']}")
-    em = live.get("settings", {}).get("emOptInStatus")
-    if not chk("opted into Entitlement Management", em == "ENABLED", str(em)):
-        return  # nothing downstream can exist until EM is on; one clear failure is enough
+    def cannot_evaluate(self, name, detail):
+        self.inconclusive.append((name, detail))
 
-    orn = f"orn:okta:idp:{ORGID}:apps:{app['app_name']}:{app['app_id']}"
-    code, ents = call("/governance/api/v1/entitlements?filter="
-                      + urllib.parse.quote(f'parentResourceOrn eq "{orn}"'))
-    chk("app resolves as a governance resource", code == 200, f"HTTP {code}")
-    role_ent = next((e for e in ents.get("data", []) if e["name"] == "Role"), None)
-    if not chk("`Role` entitlement present", role_ent is not None):
-        return
+    @property
+    def verdict(self):
+        if self.inconclusive:
+            return "INCONCLUSIVE"
+        return "FAIL" if self.failures else "PASS"
 
-    code, vals = call(f"/governance/api/v1/entitlements/{role_ent['id']}/values")
-    id_to_name = {v["id"]: v["name"] for v in vals.get("data", [])}
-    chk("entitlement values == this app's own distinct roles",
-        sorted(id_to_name.values()) == sorted(app["roles"]),
-        f"live={sorted(id_to_name.values())} expected={sorted(app['roles'])}")
 
-    code, grants = call("/governance/api/v1/grants?filter="
-                        + urllib.parse.quote(f'targetResourceOrn eq "{orn}"') + "&limit=200")
-    granted = {}
-    for g in grants.get("data", []):
-        vids = [v["id"] for e in g.get("entitlements", []) for v in e.get("values", [])]
-        granted[g["targetPrincipal"]["externalId"]] = [id_to_name.get(v, "?") for v in vids]
+def verify_app(client, app, emails, corrupt=None):
+    """Verify one app. `corrupt` names a check to sabotage (selftest only)."""
+    res = Result(app["tab"])
 
-    rows = list(csv.DictReader((PROJ / app["drop"]).open(newline="", encoding="utf-8")))
-    expected, orphans = {}, 0
-    for r in rows:
-        uid = emails.get(r["email"].strip().lower())
-        if not uid:
-            orphans += 1
-            continue
-        expected[uid] = r["app_role"].strip()
+    try:
+        ok, detail = oig_common.em_enabled(client, app)
+    except biterm_http.HttpError as e:
+        res.cannot_evaluate("em_enabled", str(e))
+        return res
+    if corrupt == "em_enabled":
+        ok, detail = False, "SELFTEST"
+    if not res.check("em_enabled", ok, detail):
+        return res
+
+    try:
+        ent_id, valmap = oig_common.entitlement_values(client, app)
+    except biterm_http.HttpError as e:
+        res.cannot_evaluate("entitlement_present", str(e))
+        return res
+    if corrupt == "entitlement_present":
+        ent_id = None
+    if not res.check("entitlement_present", ent_id is not None,
+                     "no `Role` entitlement on this app"):
+        return res
+
+    live_roles = sorted(valmap)
+    if corrupt == "entitlement_values":
+        live_roles = live_roles + ["__SELFTEST__"]
+    res.check("entitlement_values", live_roles == sorted(app["roles"]),
+              f"live={live_roles} expected={sorted(app['roles'])}")
+
+    try:
+        expected, stats = oig_common.expected_grants(app, emails)
+    except (oig_common.DropError, domain.UnknownRoleError) as e:
+        res.cannot_evaluate("highest_privilege", f"drop unusable: {e}")
+        return res
+    res.stats = stats
+
+    if corrupt == "highest_privilege" and expected:
+        expected = dict(expected)
+        expected[next(iter(expected))] = "__SELFTEST__"
+
+    id_to_name = {vid: name for name, vid in valmap.items()}
+    try:
+        granted, bare = oig_common.granted_values(client, app, id_to_name)
+    except biterm_http.HttpError as e:
+        # A truncated grants read cannot distinguish "not granted" from "not readable".
+        res.cannot_evaluate("highest_privilege", f"grants not fully readable: {e}")
+        res.cannot_evaluate("no_extra_grants", f"grants not fully readable: {e}")
+        return res
+
+    if corrupt == "no_extra_grants":
+        granted = {**granted, "__SELFTEST_PRINCIPAL__": ["Administrator"]}
 
     mism = [(u, e, granted.get(u)) for u, e in expected.items() if granted.get(u) != [e]]
-    chk("every granted value matches the role in the drop", not mism,
-        f"{len(mism)} mismatched, e.g. {mism[:2]}")
-    chk("every resolvable drop identity has a grant", set(expected) <= set(granted),
-        f"missing {len(set(expected) - set(granted))}")
+    res.check("highest_privilege", not mism,
+              f"{len(mism)} mismatched, e.g. {mism[:2]}")
     extra = set(granted) - set(expected)
-    chk("no grant for anyone absent from the drop", not extra, f"{len(extra)} extra")
-    chk("coverage adds up (resolvable + orphans == rows)",
-        len(expected) + orphans == len(rows), f"{len(expected)}+{orphans} vs {len(rows)}")
-    print(f"  ok   {tab:<20} grants={len(granted):>4} resolvable={len(expected):>4} "
-          f"orphans={orphans:>4} roles={len(id_to_name)}")
+    res.check("no_extra_grants", not extra, f"{len(extra)} principal(s) hold a value but are "
+                                            f"absent from the drop: {sorted(extra)[:5]}")
+
+    counted = stats["resolvable_rows"] + stats["orphan_rows"] + stats["unknown_role_rows"]
+    if corrupt == "row_coverage":
+        counted += 1
+    res.check("row_coverage", counted == stats["rows"],
+              f"{stats['resolvable_rows']}+{stats['orphan_rows']}+{stats['unknown_role_rows']} "
+              f"= {counted} vs {stats['rows']} rows")
+
+    if bare:
+        res.warnings.append(f"bare_grants={bare} (value-less; cannot be deleted via API)")
+    if stats["unknown_role_rows"]:
+        res.warnings.append(f"unknown_role_rows={stats['unknown_role_rows']} "
+                            f"{stats['unknown_roles']} — those rows carry no certifiable role")
+    return res
 
 
-def main():
-    args = sys.argv[1:]
-    only = args[args.index("--only") + 1] if "--only" in args else None
-    manifest = json.loads(MANIFEST.read_text())
-    if only:
-        manifest = [m for m in manifest if m["tab"] == only]
+def report(results):
+    for r in results:
+        s = r.stats
+        marker = {"PASS": "ok  ", "FAIL": "FAIL", "INCONCLUSIVE": "????"}[r.verdict]
+        warn = ("  WARN " + "; ".join(r.warnings)) if r.warnings else ""
+        log.info(f"  {marker} {r.tab:<20} principals={s.get('principals', '?'):>4} "
+                 f"orphan_rows={s.get('orphan_rows', '?'):>4} rows={s.get('rows', '?'):>4}{warn}")
+    for r in results:
+        for name, detail in r.failures:
+            log.error(f"FAIL [{r.tab}] {name}{' — ' + detail if detail else ''}")
+        for name, detail in r.inconclusive:
+            log.error(f"INCONCLUSIVE [{r.tab}] {name} — {detail}")
 
-    emails = all_users_by_email()
-    failures = []
-    for app in manifest:
-        verify_app(app, emails, failures)
-    for f in failures:
-        print(f)
-    print(f"\nVERDICT: {'PASS' if not failures else 'FAIL'} "
-          f"({len(manifest)} apps, {len(failures)} failures)")
-    sys.exit(1 if failures else 0)
+
+def selftest(client, manifest, emails):
+    """Prove EVERY check is falsifiable, per app, one corruption at a time.
+
+    The old selftest corrupted a single map and asserted `len(failures) >= len(manifest)` —
+    a run-wide sum, so one app producing ten failures while nine produced none still passed.
+    """
+    broken = []
+    for check in CHECKS:
+        survived = []
+        for app in manifest:
+            res = verify_app(client, app, emails, corrupt=check)
+            # The named check must appear in THIS app's failures. Asserting per app is the
+            # point: a run-wide failure count can be satisfied entirely by one noisy app.
+            if not any(name == check for name, _ in res.failures):
+                survived.append(f"{check} did NOT fail on corrupted data for {app['tab']}"
+                                + (f" (inconclusive: {res.inconclusive})" if res.inconclusive else ""))
+        broken += survived
+        log.info(f"  selftest {check:<22} "
+                 + ("ok — trips on every app" if not survived
+                    else f"BROKEN on {len(survived)}/{len(manifest)} app(s)"))
+    if broken:
+        log.error("\nSELFTEST BROKEN — these checks cannot detect the fault they exist for:")
+        for b in broken:
+            log.error(f"    · {b}")
+        return 2
+    log.info(f"\nSELFTEST: OK — all {len(CHECKS)} checks fail on corrupted data, "
+             f"on all {len(manifest)} app(s)")
+    return 0
+
+
+def parse_args(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__, allow_abbrev=False,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--only", metavar="TAB", help="limit to one app tab from oig_apps.json")
+    ap.add_argument("--selftest", action="store_true",
+                    help="prove every check fails on corrupted data, then exit")
+    ap.add_argument("--verbose", action="store_true")
+    return ap.parse_args(argv)
+
+
+def main(argv=None):
+    global log
+    args = parse_args(argv)
+    log = runlog.setup("oig_verify_all", verbose=args.verbose)
+    log.info(f"run {runlog.run_id()} | {biterm_config.describe()}")
+
+    client = oig_common.admin_client("oig_verify_all", dry_run=True, logger=log)
+    manifest = oig_common.load_manifest(args.only)
+    try:
+        emails = oig_common.users_by_email(client)
+    except (biterm_http.HttpError, oig_common.DuplicateIdentityError) as e:
+        log.error(f"INCONCLUSIVE — could not build the identity map: {e}")
+        log.error("\nVERDICT: INCONCLUSIVE (0 apps evaluated)")
+        return 2
+
+    if args.selftest:
+        return selftest(client, manifest, emails)
+
+    results = [verify_app(client, app, emails) for app in manifest]
+    report(results)
+
+    n_fail = sum(1 for r in results if r.verdict == "FAIL")
+    n_inc = sum(1 for r in results if r.verdict == "INCONCLUSIVE")
+    checks_failed = sum(len(r.failures) for r in results)
+    if n_inc:
+        verdict, code = "INCONCLUSIVE", 2
+    elif n_fail:
+        verdict, code = "FAIL", 1
+    else:
+        verdict, code = "PASS", 0
+    log.info(f"\nVERDICT: {verdict} ({len(manifest)} apps, {checks_failed} failed checks, "
+             f"{n_inc} app(s) not evaluable)")
+    if verdict == "PASS":
+        log.info("Run --selftest to confirm these checks can still fail.")
+    return code
 
 
 if __name__ == "__main__":
-    main()
+    # Entrypoints translate typed library errors into a clean exit. Library code
+    # never calls sys.exit itself — the caller decides what is fatal.
+    try:
+        sys.exit(main())
+    except (biterm_config.ConfigError, biterm_creds.CredentialError,
+            biterm_http.HttpError, okta_oauth.OAuthError,
+            oig_common.ManifestError, oig_common.DropError) as e:
+        sys.exit(f"ABORTED: {e}")

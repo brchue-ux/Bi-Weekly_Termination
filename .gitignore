@@ -3,6 +3,9 @@ __pycache__/
 *.pyc
 .venv/
 
+# Local environment configuration (may name the real work tenant)
+config.json
+
 # Real / not-fully-de-identified data — never commit.
 # See project history: SFDC file was locked to 700 rather than run through the
 # re-identity rewrite (the app+users were removed from scope instead), and
@@ -10,11 +13,26 @@ __pycache__/
 App User Lists/FAKE USERS - SFDC 3rd party user list.xlsx
 App User Lists/.originals/
 
-# Generated run output — regenerable from the scripts + source rosters, not source itself.
-cycles/
-cycles_feed/
+# CONTROL EVIDENCE — TRACKED ON PURPOSE (changed 2026-07-26).
+# These were previously ignored as "regenerable from the scripts + source rosters". That is
+# not true: a cycle's output also depends on live tenant state at run time AND on the prior
+# cycle's state.json, which carries every finding's age, ticket number and first-seen cycle.
+# Losing this directory means every open finding re-tickets and no closure can be evidenced.
+# state.json / SHA256SUMS / evidence_manifest.json / tickets.jsonl are the control's ledger.
+#
+# The workbooks and digests ARE regenerable from the ledger, so they stay out of git to keep
+# the repo small — but the ledger itself is version-controlled.
+cycles/**/report.xlsx
+cycles/**/digest_*.md
+cycles_feed/**/report.xlsx
+cycles_feed/**/digest_*.md
 reports/
 test_rosters/
+
+# Local run logs. The CHANGE log (logs/*.changes.jsonl) is the record of every mutating API
+# call; keep it out of git (it embeds request/response bodies incl. PII) but do NOT delete
+# it — archive it with the cycle evidence per your retention policy.
+logs/
 
 # Operational logs / screenshots, not project content.
 *.log

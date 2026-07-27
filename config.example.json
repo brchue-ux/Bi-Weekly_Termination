@@ -1,21 +1,75 @@
 {
+  "_comment": "Copy to config.json (git-ignored) and fill in. Any key omitted falls back to the demo-tenant default in scripts/biterm_config.py; BITERM_* environment variables override both.",
   "org": "https://your-real-work-org.okta.com",
+  "org_id": "your-okta-org-id-00oXXXXXXXXXXXXXXXXX",
   "client_id": "your-api-services-app-client-id",
   "private_key_file": "/home/YOURUSER/.secrets/okta_term_revamp_private.pem",
   "kid": "term-revamp-key-1",
-  "scopes": ["okta.apps.read", "okta.apps.manage", "okta.users.read"],
+  "scopes": [
+    "okta.apps.read",
+    "okta.apps.manage",
+    "okta.users.read"
+  ],
+  "admin_token_file": "/home/YOURUSER/.secrets/okta_admin_ssws.txt",
+  "servicenow": {
+    "instance": "https://yourinstance.service-now.com",
+    "credentials_file": "/home/YOURUSER/.secrets/servicenow.txt",
+    "catalog_item": "sys_id of the 'Terminated User Access Removal' catalog item",
+    "assignment_group": "Access Management",
+    "assignee": ""
+  },
+  "http": {
+    "timeout_seconds": 30,
+    "max_attempts": 6,
+    "backoff_base_seconds": 1.0,
+    "backoff_cap_seconds": 60.0
+  },
+  "removal_guard": {
+    "max_absolute": 10,
+    "max_fraction": 0.1
+  },
   "roster_dir": "/home/YOURUSER/projects/termination_revamp_v1/work_rosters",
   "column": "UPN",
   "apps": [
-    { "label": "Diligent (Bi-Weekly Term Test)", "export": "Diligent.csv" },
-    { "label": "Docusign (Bi-Weekly Term Test)", "export": "Docusign.csv" },
-    { "label": "Dynamics AX NA (Bi-Weekly Term Test)", "export": "Dynamics_AX_NA.csv" },
-    { "label": "Dynamics AX UK (Bi-Weekly Term Test)", "export": "Dynamics_AX_UK.csv" },
-    { "label": "Efax (Bi-Weekly Term Test)", "export": "Efax.csv" },
-    { "label": "SFDC RWCS 3rd Party (Bi-Weekly Term Test)", "export": "SFDC_RWCS_3rd_Party.csv" },
-    { "label": "SFDC RWCS CAN (Bi-Weekly Term Test)", "export": "SFDC_RWCS_CAN.csv" },
-    { "label": "SFDC SID EMEA (Bi-Weekly Term Test)", "export": "SFDC_SID_EMEA.csv" },
-    { "label": "Steriworks NA (Bi-Weekly Term Test)", "export": "Steriworks_NA.csv" },
-    { "label": "Steriworks UK (Bi-Weekly Term Test)", "export": "Steriworks_UK.csv" }
+    {
+      "label": "Diligent (Bi-Weekly Term Test)",
+      "export": "Diligent.csv"
+    },
+    {
+      "label": "Docusign (Bi-Weekly Term Test)",
+      "export": "Docusign.csv"
+    },
+    {
+      "label": "Dynamics AX NA (Bi-Weekly Term Test)",
+      "export": "Dynamics_AX_NA.csv"
+    },
+    {
+      "label": "Dynamics AX UK (Bi-Weekly Term Test)",
+      "export": "Dynamics_AX_UK.csv"
+    },
+    {
+      "label": "Efax (Bi-Weekly Term Test)",
+      "export": "Efax.csv"
+    },
+    {
+      "label": "SFDC RWCS 3rd Party (Bi-Weekly Term Test)",
+      "export": "SFDC_RWCS_3rd_Party.csv"
+    },
+    {
+      "label": "SFDC RWCS CAN (Bi-Weekly Term Test)",
+      "export": "SFDC_RWCS_CAN.csv"
+    },
+    {
+      "label": "SFDC SID EMEA (Bi-Weekly Term Test)",
+      "export": "SFDC_SID_EMEA.csv"
+    },
+    {
+      "label": "Steriworks NA (Bi-Weekly Term Test)",
+      "export": "Steriworks_NA.csv"
+    },
+    {
+      "label": "Steriworks UK (Bi-Weekly Term Test)",
+      "export": "Steriworks_UK.csv"
+    }
   ]
 }

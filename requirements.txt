@@ -1,0 +1,15 @@
+# Runtime dependencies for the BiTerm termination control.
+#
+# The pipeline is deliberately near-stdlib: project scripts run on SYSTEM python (which has
+# no pip and is PEP-668 externally managed), so xlsx/docx handling is hand-rolled
+# (scripts/xlsx_min.py, scripts/xlsx_write.py, scripts/docx_write.py) rather than taking
+# openpyxl/python-docx as runtime deps.
+#
+# PyJWT is the ONE exception: it signs the private_key_jwt client assertion for the OAuth
+# service app. It is imported lazily (scripts/okta_oauth.py), so --help, the unit tests and
+# every read-only path that never mints a token run without it installed.
+PyJWT>=2.8.0
+
+# Test + verification tooling: none. The suite is stdlib unittest, run with
+#   python3 tests/run_tests.py
+# which also runs a mutation pass proving the suite can fail.

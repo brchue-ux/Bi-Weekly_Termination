@@ -18,7 +18,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from okta_oauth import get_access_token
+from okta_oauth import OAuthError, get_access_token
 
 ORG = "https://demo-beige-haddock-4684.okta.com"
 ADMIN_TOKEN_PATH = os.path.expanduser("~/.secrets/claude_3rd_party.txt")
@@ -72,7 +72,7 @@ def main():
     try:
         token = get_access_token(ORG, client_id, PRIVATE_KEY_PATH, scopes=READ_SCOPES, kid=KID)
         check("TOKEN", True, f"bearer issued ({len(token)} chars)")
-    except SystemExit as e:
+    except OAuthError as e:
         check("TOKEN", False, str(e))
         print("\nVERDICT: FAIL")
         sys.exit(1)
@@ -94,7 +94,7 @@ def main():
     try:
         get_access_token(ORG, client_id, PRIVATE_KEY_PATH, scopes=["okta.users.manage"], kid=KID)
         check("UNGRANTED scope refused", False, "token was issued — grant list is wider than intended")
-    except SystemExit as e:
+    except OAuthError as e:
         check("UNGRANTED scope refused", "400" in str(e) or "401" in str(e), str(e)[:120])
 
     verdict = "PASS" if not failures else f"FAIL ({', '.join(failures)})"

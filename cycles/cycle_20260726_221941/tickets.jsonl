@@ -1,0 +1,29 @@
+{"correlation_id": "biterm-bb1756f64e6d2ed28837c880", "app": "NA Apollo", "key": "acct:lorenzo.bekele", "ticket": "REQ0010143/RITM0010132/SCTASK0010190", "adopted": false}
+{"correlation_id": "biterm-b9358d4b9c80dad96d9f02d7", "app": "NA Apollo", "key": "acct:rashida.lundgren", "ticket": "REQ0010144/RITM0010133/SCTASK0010191", "adopted": false}
+{"correlation_id": "biterm-c87e7ff7d2f25cd40d398f08", "app": "NA Stellar", "key": "acct:sanne.teixeira", "ticket": "REQ0010145/RITM0010134/SCTASK0010192", "adopted": false}
+{"correlation_id": "biterm-02eeb2c310329015f0665a01", "app": "NA Stellar", "key": "acct:anika.nakamura", "ticket": "REQ0010146/RITM0010135/SCTASK0010193", "adopted": false}
+{"correlation_id": "biterm-ec61f5134ecf6a189b7f7947", "app": "NA Stellar", "key": "acct:hmarkovic", "ticket": "REQ0010147/RITM0010136/SCTASK0010194", "adopted": false}
+{"correlation_id": "biterm-d98a8c933e4cc03144da6ae1", "app": "NA Stellar", "key": "acct:basim.polat", "ticket": "REQ0010148/RITM0010137/SCTASK0010195", "adopted": false}
+{"correlation_id": "biterm-74491a39515f94786d9e07a9", "app": "NA Stellar", "key": "acct:bao.kilic", "ticket": "REQ0010149/RITM0010138/SCTASK0010196", "adopted": false}
+{"correlation_id": "biterm-0e6318996ec3e0fd12491994", "app": "NA Stellar", "key": "acct:straore", "ticket": "REQ0010150/RITM0010139/SCTASK0010197", "adopted": false}
+{"correlation_id": "biterm-d370323fe20c0893b5a5599c", "app": "NA Stellar", "key": "acct:amina.forsberg", "ticket": "REQ0010151/RITM0010140/SCTASK0010198", "adopted": false}
+{"correlation_id": "biterm-c6cd1749149b7c2241ae95c2", "app": "NA Stellar", "key": "acct:seda.barone", "ticket": "REQ0010152/RITM0010141/SCTASK0010199", "adopted": false}
+{"correlation_id": "biterm-29699d30108d0f77b6a93e69", "app": "NA Orion", "key": "acct:tahira.vella", "ticket": "REQ0010153/RITM0010142/SCTASK0010200", "adopted": false}
+{"correlation_id": "biterm-ae87c4d70e88f1808d76b601", "app": "NA Orion", "key": "acct:marta.seo", "ticket": "REQ0010154/RITM0010143/SCTASK0010201", "adopted": false}
+{"correlation_id": "biterm-5e47377d6293f66e6d13e634", "app": "NA Orion", "key": "acct:jovana.nair", "ticket": "REQ0010155/RITM0010144/SCTASK0010202", "adopted": false}
+{"correlation_id": "biterm-e9ec67b74654d91ed6aa1543", "app": "NA Orion", "key": "acct:amara.markovic", "ticket": "REQ0010156/RITM0010145/SCTASK0010203", "adopted": false}
+{"correlation_id": "biterm-3b295f7055a83903b63617e6", "app": "NA Orion", "key": "acct:aozturk", "ticket": "REQ0010157/RITM0010146/SCTASK0010204", "adopted": false}
+{"correlation_id": "biterm-c7a3f916d9b7319649dc9989", "app": "NA Orion", "key": "acct:naledi.worku", "ticket": "REQ0010158/RITM0010147/SCTASK0010205", "adopted": false}
+{"correlation_id": "biterm-a304b78c77e269b54577ee58", "app": "NA Orion", "key": "acct:mahmoud.teixeira", "ticket": "REQ0010159/RITM0010148/SCTASK0010206", "adopted": false}
+{"correlation_id": "biterm-5a6d8eb86bebd3329f23855c", "app": "NA Orion", "key": "acct:bmensah", "ticket": "REQ0010160/RITM0010149/SCTASK0010207", "adopted": false}
+{"correlation_id": "biterm-e67d6fd27e27c5db091eed98", "app": "NA Orion", "key": "acct:soren.bosman", "ticket": "REQ0010161/RITM0010150/SCTASK0010208", "adopted": false}
+{"correlation_id": "biterm-afe5f155e7825fdd386ce648", "app": "NA Orion", "key": "acct:elzbieta.krawczyk", "ticket": "REQ0010162/RITM0010151/SCTASK0010209", "adopted": false}
+{"correlation_id": "biterm-23fef316ee422dd401264eba", "app": "NA Saturn East", "key": "acct:iker.deluca", "ticket": "REQ0010163/RITM0010152/SCTASK0010210", "adopted": false}
+{"correlation_id": "biterm-2c148a15a0c5f7b3091d1867", "app": "NA Saturn East", "key": "acct:trung.abebe", "ticket": "REQ0010164/RITM0010153/SCTASK0010211", "adopted": false}
+{"correlation_id": "biterm-43c379b0bffd55ff015c330c", "app": "NA Saturn East", "key": "acct:thiago.baraka", "ticket": "REQ0010165/RITM0010154/SCTASK0010212", "adopted": false}
+{"correlation_id": "biterm-e9d00a945461d3b799d365ad", "app": "NA Saturn Central", "key": "acct:cem.fonseca", "ticket": "REQ0010166/RITM0010155/SCTASK0010213", "adopted": false}
+{"correlation_id": "biterm-e1c523bfc5bfe7c5b007c453", "app": "NA Saturn Central", "key": "acct:roisin.ferrari", "ticket": "REQ0010167/RITM0010156/SCTASK0010214", "adopted": false}
+{"correlation_id": "biterm-cad4e03096ae3726b218917f", "app": "NA Saturn Central", "key": "acct:xiu.jankowski", "ticket": "REQ0010168/RITM0010157/SCTASK0010215", "adopted": false}
+{"correlation_id": "biterm-9fcd28fb1f77fb4a5bfffdc4", "app": "NA Saturn West", "key": "acct:anahi.vandenberg", "ticket": "REQ0010169/RITM0010158/SCTASK0010216", "adopted": false}
+{"correlation_id": "biterm-b96734f4e9c08eeaeb8b51c9", "app": "NA Saturn West", "key": "acct:tariq.zielinski", "ticket": "REQ0010170/RITM0010159/SCTASK0010217", "adopted": false}
+{"correlation_id": "biterm-4ad6737f19287103bb698382", "app": "NA Saturn West", "key": "acct:nikolai.uchida", "ticket": "REQ0010171/RITM0010160/SCTASK0010218", "adopted": false}

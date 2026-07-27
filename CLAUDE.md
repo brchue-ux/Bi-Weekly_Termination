@@ -9,73 +9,45 @@ describing what was done. Only edit THIS file if a standing fact changed — the
 a credential/environment detail, an architecture decision, or an open question. Don't let
 "built + verified 2026-0X-XX" narrative accumulate back into this file.
 
-## ⚠️ RESUME HERE — OIG rollout IN PROGRESS, halted mid-load 2026-07-24 (correctness stop)
+## OIG entitlement rollout — LOADED + VERIFIED (2026-07-26); halted-load defect resolved
 
-**All 10 apps converted to SAML + EM enabled + entitlements created. Grant load was DELIBERATELY
-KILLED partway to fix a real defect. Do NOT just "finish the load" — the loader is wrong for
-multi-account users. Read this whole block before touching the tenant.**
+**All 10 apps: SAML + EM enabled + per-app `Role` entitlement (each app's own roles, all
+`multiValue=False`) + grants loaded per HIGHEST-PRIVILEGE-WINS.** Independently verified:
+`scripts/oig_verify_all.py` → **VERDICT PASS (10 apps, 0 failures)**; its `--selftest` fails on all
+10 (checker proven falsifiable). Full story in CHANGELOG.md (2026-07-26 entry).
 
-**Done + verified this session:**
-- `scripts/oig_saml_rollout.py` (ran `--apply`): created the 9 remaining apps as custom SAML, label
-  `BiTerm OIG - <tab>` (never `BiTerm - `, which the recon filter keys on). ComSat pre-existed
-  → 10 total. Re-queried live: all 10 SAML + ACTIVE. Manifest in `oig_apps.json`
-  (tab→app_id→app_name→drop→roles→emOptInStatus) — source of truth for the OIG tooling.
-- User enabled Entitlement Management on all 10 in the Console (UI-only, as always). Verified
-  em=ENABLED on all 10 directly, not on trust.
-- Per-app `Role` entitlement created on ALL 10 (values = each app's OWN distinct roles). **These
-  are all `multiValue=False` right now.**
-- Pagination bug fixed + reusable: Okta returns TWO `Link` headers; `headers.get("Link")` grabs
-  `rel="self"` and the pager never advances (silently truncates at 200 users). Use
-  `headers.get_all("Link")`. All new OIG scripts do.
-- Population truth (from correct paging): 2,048 Okta users; 3,953 resolvable assignments across
-  the 9 new apps; 431 orphans. Reconciles across both scripts.
+**The multi-account / conflicting-role fix (was the halted defect):** a person can hold several
+accounts with different roles in one app; the old first-row-wins loader could grant a lower role
+and hide an Administrator — the exact SOX masking the control exists to catch. **Resolved via
+Option B+: aggregate every role a person holds, grant the single highest** (Administrator >
+Power User > Standard User > Read Only > Service Account). Per-account detail stays in the
+reconciliation (two-control split). 136 conflicted principals; 37 needed correction.
 
-**Why the load was killed (the defect — this is the resume task):**
-- Drops have heavy DUPLICATE emails (one person, multiple accounts in the same app): Orion 293
-  dup rows, Stellar 539, HQ 9, etc. Grant count therefore = DISTINCT resolvable principals, not rows.
-- Worse: **137 emails hold CONFLICTING roles across their rows** (e.g. `umar.hoshino` = Power User
-  AND Administrator in NA Orion). The single-value `Role` + first-row-wins loader grants ONE role
-  and skips the rest → **it can hide an Administrator behind a Power User.** For a SOX
-  privilege-certification control that is exactly the masking the control exists to catch.
-  Unacceptable; stopped rather than finish a wrong load.
-- **Current tenant state (authoritative, measured post-kill): 2,072 single-value grants exist**
-  (interrupted mid-Stellar: Stellar only 240 of ~1,367). Non-conflicted principals (~96%) are
-  correct; the 137 conflicted ones may carry the wrong (non-highest) role.
+**Grant/entitlement mutability (probed live — governs any future change):** grant value can't be
+PATCHed/PUT (400); grants can't be individually DELETEd (400); entitlement `multiValue` can't be
+flipped in place (400); deleting an entitlement leaves *bare* grants (assignment intact,
+`entitlements: []`), doesn't cascade; `DELETE /apps/{id}/users/{uid}` doesn't remove the grant
+either. **The only lever is POSTing a value, which REPLACES the principal's current value.** So
+corrections are overwrite-in-place; there is no clean grant deletion.
 
-**Unresolved DESIGN DECISION (make this first, next session):** how to represent a person with
-multiple accounts / conflicting roles in one app:
-- **Option A — multiValue=true `Role`**: grant ALL of a person's distinct roles; reviewer sees
-  "Power User, Administrator". Most faithful (textbook IGA). Needs entitlement recreation + reload.
-- **Option B+ — single value, HIGHEST-PRIVILEGE wins** (Administrator>Power User>Standard User>
-  Read Only>Service Account): never hides privilege; per-account detail stays in the
-  reconciliation (per-row). Simpler; fits the two-control split.
-- **BLOCKER TO PROBE before choosing:** grant mutability. `DELETE /grants/{id}` → 400 (individual
-  grants can't be deleted). So correcting the 137 in place may be impossible → likely must DELETE
-  the entitlement (does it cascade its grants? UNTESTED) and reload, OR test PATCH/PUT of
-  entitlement `multiValue` and whether a 2nd grant for the same principal+entitlement+different
-  value is accepted. Probe these on ONE app before committing.
+**Campaigns:** `scripts/oig_run_campaigns.py` (entitlement flags + AM-team reviewers Zyler/Phil).
+- LIVE + ACTIVE: `BiTerm — Access Certification (LIVE): NA Saturn ComSat` `ici11c29d1yN6cZo9697`
+  (20 items = 20 grants, all carry `entitlementValue`).
+- DORMANT/SCHEDULED (never launched, +365d): `BiTerm — Access Certification (PREPARED):
+  CloudForce HQ` `ici11c297d4rUoS5P697`. IDs also in `oig_run_campaigns.json`.
+- `scripts/oig_build_campaigns.py` (build-but-never-launch the 3 archetypes) still exists, NEVER RUN.
 
-**Resume steps (in order):**
-1. Probe the grant/entitlement mutability APIs above on one app; pick Option A or B+.
-2. Rework `scripts/oig_load_all.py`: dedupe per principal, AGGREGATE roles per person (set), grant per
-   the chosen option. It currently does first-row-wins — that is the bug.
-3. Fix `scripts/oig_verify_all.py` (written, NEVER RUN — has a latent bug): its coverage check
-   `len(expected_distinct_uids) + orphan_ROWS == len(rows)` is WRONG with duplicates, and its
-   role check compares a single value, not a set. Rework to compare role SETS per principal.
-4. Clean up the 2,072 partial single-value grants + entitlements per the chosen path, then reload
-   cleanly and get `scripts/oig_verify_all.py` → VERDICT PASS on all 10 (prove it can fail first).
-5. Build campaigns: `scripts/oig_build_campaigns.py` (written, NEVER RUN). Creates-but-NEVER-launches the
-   3 archetypes (per-app entitlement cert ×10, Quarterly UAR over all 10, Flagged-Population user
-   campaign from latest cycle), reviewers = AM team Zyler/Phil (NOT bchue@wm.com — off-limits),
-   dormant SCHEDULED with a +365d start, both entitlement flags set, remediation NO_ACTION. Run
-   `--apply` and confirm 0 ACTIVE. **User instruction: build campaigns + flow but EXECUTE NEITHER.**
-6. Flow = Console-only (no API builds Workflows). `docs/OIG_WORKFLOWS_BUILD_GUIDE.md` updated with
-   a "generalize to all 10 apps" section. Nothing to run; the scripts are the tested reference.
+**Pagination gotcha (baked into all OIG scripts):** Okta returns TWO `Link` headers;
+`headers.get("Link")` grabs `rel="self"` and the pager silently truncates at 200 users. Use
+`headers.get_all("Link")`.
 
-**Also delivered (not blocked): `docs/ORPHAN_REDUCTION_PLAN.md`** — data-grounded plan to map real
-people to the 431 orphans. Measured slices: 145 service accounts, 62 already name-match an Okta
-person, 157 privileged (do first), 41 active-recent-login, 20 disabled. Highest lever = ask app
-owners to add `employee_id` (+ `owner` for service accounts) to every export.
+**Population truth (correct paging):** 2,048 Okta users; grants across 10 apps; 431 orphans.
+
+**Next (not started): orphan reduction** — `docs/ORPHAN_REDUCTION_PLAN.md` maps real people to the
+431 orphans. Measured slices: 145 service accounts, 62 name-match an Okta person, 157 privileged
+(do first), 41 active-recent-login, 20 disabled. Highest lever = ask app owners to add
+`employee_id` (+ `owner` for service accounts). First slice proposed: 62 name-matches,
+privileged-first, cascade → propose → human worksheet → write-back alias → prove count drops.
 
 ## Real work deliverable (SOX-controlled)
 
@@ -103,13 +75,35 @@ authorized beyond seeding (biweekly reconciliation pipeline is built + verified,
 - **Sequencing (resolved 2026-07-22):** now, Okta is a *data source* (orphan-detection leg)
   feeding an external pipeline. Later, per-app as SCIM/connector onboarding lands, Okta becomes
   the *remediation engine* and that app's manual-removal step drops out; the review runs unchanged.
+- **Code footprint / what to tell leadership (2026-07-26):** this is NOT a dev-team backend
+  build. Campaign creation, reviewer assignment, and launch are **native Admin Console** (the
+  scripts only make it repeatable). The only "code" is the entitlement *loader* — needed solely
+  because these apps are disconnected/CSV-fed — and it is **disposable scaffolding that SCIM
+  retires app-by-app** (a SCIM connector imports accounts+entitlements natively, so the loader
+  is deleted per app, not extended). The reconciliation (today's vlookup, upgraded) is
+  analyst-owned (Power Query/Power BI or a small script), not a dev project. **The automation
+  footprint SHRINKS as SCIM onboards, it does not grow.**
+- **Campaign → real remediation is a config flip, not a rewrite:** the same campaign runner
+  carries over to a SCIM-connected app; the one change is `remediationSettings` NO_ACTION →
+  actual deprovision, which the connector (not new code) enforces. The verifier is reusable as a
+  drift check against imported data.
 
 ## Verification gate (user-mandated 2026-07-22)
 
 **No "seeded / fixed / complete / good" claim about tenant state may be made from a seeder or
 fixer's own logs.** The only acceptable evidence is a fresh run of the relevant `verify_*.py`
 script — it recomputes expected state from the source files and reconciles against live API
-pulls, ending in a single `VERDICT: PASS|FAIL` line. Quote that run's output when claiming done.
+pulls, ending in a single `VERDICT: PASS|FAIL|INCONCLUSIVE` line. Quote that run's output when
+claiming done. `INCONCLUSIVE` is never a pass: it means a check could not be evaluated (rate
+limit, truncated read), which a verifier must be able to say rather than manufacture a verdict.
+
+**For control LOGIC (not tenant state), the gate is `python3 tests/run_tests.py`** — green
+suite plus every control-rule mutation caught.
+
+**Write guard (learned the hard way 2026-07-26):** every script that writes fails CLOSED when
+there is no terminal — non-interactive + no explicit `--yes` = abort, never "proceed
+unconfirmed". Absence of a human is a reason to stop. `allow_abbrev=False` everywhere, so no
+partial flag is ever guessed into a live run.
 
 ## Reference — credentials & environment
 
@@ -128,8 +122,24 @@ pulls, ending in a single `VERDICT: PASS|FAIL` line. Quote that run's output whe
   login resets the clock — API activity does NOT. Weekly keepalive: `scripts/pdi_keepalive.py` via
   systemd user timer (`pdi-keepalive.timer`, Mon 09:00); ANY failure pushes to ntfy.sh
   (`biterm-pdi-ea3c383b70d9`). Backstop: ServiceNow's own 10-day warning email.
-- Data: `App User Lists/` (real de-identified rosters; `openpyxl` NOT installed — `scripts/xlsx_min.py`
-  parses xlsx as zip+XML). Users fully re-identified (no source names survive as pairings —
+- Config: `config.json` (git-ignored; template `config.example.json`) or `BITERM_*` env vars
+  override the demo-tenant defaults in `scripts/biterm_config.py`. Nothing hardcodes the org.
+- Dependencies: `requirements.txt` — PyJWT only, imported lazily, so tests and every
+  read-only/`--help` path run on bare system python.
+- Data: `App User Lists/` (real de-identified rosters). **System python3 has NO pip and NO
+  openpyxl/lxml, and is PEP-668 externally managed** — project scripts run on system python and
+  must keep using `scripts/xlsx_min.py` (zip+XML) / `scripts/docx_write.py` (raw OOXML). A separate
+  venv `~/.venvs/docs/bin/python` (created 2026-07-26) holds python-docx + openpyxl + lxml, for
+  *verifying* generated files and for one-off tooling — never as a runtime dependency of the
+  pipeline.
+- **Document page counts must be MEASURED, never estimated:**
+  `soffice --headless --convert-to pdf --outdir <dir> <f>.docx && pdfinfo <dir>/<f>.pdf`.
+  Visual check: `pdftoppm -png -r 100 <f>.pdf out` then view the PNG. LibreOffice + pandoc are
+  installed (user, 2026-07-26). **Carlito is required for fidelity** — it's Calibri's metric twin,
+  installed user-level in `~/.local/share/fonts` with a `~/.config/fontconfig/fonts.conf` rule
+  mapping `Calibri Light`→Carlito; without it LibreOffice substitutes a wider face and reports
+  ~15% more pages than Word (19-page doc read as 22). With it, LO matches Word exactly.
+  `scripts/docx_estimate.py` is a fast smell test only — it was wrong by 3 pages; don't quote it. Users fully re-identified (no source names survive as pairings —
   `scripts/verify_reidentity_tenant.py` → PASS). **`bchue@wm.com` is the user's own account, PERMANENTLY
   OFF-LIMITS.**
 
@@ -156,15 +166,41 @@ pulls, ending in a single `VERDICT: PASS|FAIL` line. Quote that run's output whe
 
 Full API-fact list, campaign body schemas, and every proof run: `CHANGELOG.md`.
 
-## Code state
+## Code state (hardened 2026-07-26 — see docs/CODE_REVIEW_2026-07-26.md)
 
-- `scripts/okta_bookmark_sync.py` — **known bug: parse_xlsx reads only `sheet1.xml`**, silently empty for
-  9 of 10 STARS tabs. Fix before trusting anything downstream (superseded by `scripts/xlsx_min.py` for
-  new work).
-- `scripts/run_all.py` — config-driven runner; real-tenant runs are executed by the user, not Claude
-  (build/test in sandbox only, user runs against real data).
+**Shared layer — use these, do not hand-roll:** `biterm_config` (tenant/SN/http settings;
+`config.json` + `BITERM_*` env override demo defaults), `biterm_domain` (HR status sets,
+privilege order, date parsing, identity keys — pure, unit-tested), `biterm_creds` (0600-checked,
+key-based secret parsing), `biterm_http` (**the** HTTP client: timeouts, uniform retry ladder,
+typed errors, `get_all("Link")` paging), `biterm_runlog` (logging + `logs/<run>.changes.jsonl`
+change record + SHA256 evidence manifests), `oig_common` (the single OIG derivation shared by
+loader and verifier). 21 hand-rolled clients and 19 hardcoded org URLs are gone.
+
+- `scripts/okta_bookmark_sync.py` — the `sheet1.xml` parser bug is **FIXED** (uses `xlsx_min`).
+  Resolution is fail-closed (a 429/5xx can no longer be read as "user absent" and land someone
+  in the removal set); assignments paginate.
+- `scripts/run_all.py` — the only entrypoint that can REMOVE access. Blast-radius guard
+  (`guard_removals`) + exact-hostname confirmation showing the computed change set.
+  Real-tenant runs are executed by the user, not Claude.
+- `scripts/biweekly_recon.py` — tickets are idempotent via a deterministic `correlation_id`
+  queried in ServiceNow before ordering; `tickets.jsonl` is fsynced per chain and `state.json`
+  written atomically, so a crash mid-loop no longer orphans chains. Findings key on a stable
+  account identity (a backfilled UPN is no longer a false "verified closure"); prior-state
+  matching falls back to the legacy key.
+- `scripts/oig_verify_all.py` — three-valued verdict PASS/FAIL/**INCONCLUSIVE**; `--selftest`
+  corrupts every check in turn and asserts per app.
+- `tests/` — 76 unit tests, stdlib only: `python3 tests/run_tests.py`. It also runs a
+  MUTATION pass that breaks each control rule and requires the suite to go red; a surviving
+  mutation is reported by name. Green suite + all mutations caught = the rules are covered.
 - `scripts/bulk_bookmark_rollout.py` — obsolete (dead sandbox), safe to ignore.
 - `UNMATCHED_TRIAGE_PLAN.md` — triage design, plan only.
+
+**Permanent control vs disposable scaffolding.** The loader/seeder/campaign scripts are
+scaffolding SCIM retires per app. `biweekly_recon.py`, `feed_ingest.py`, `xlsx_min.py`, the
+shared `biterm_*` layer and the cycle ledger are PERMANENT — they are the detective control
+that keeps running after SCIM lands. Engineering standard (timeouts, tests, idempotency,
+evidence) applies to the permanent half without exception; the shrinking-footprint story is
+about the scaffolding, not a licence to hold the control to script standards.
 
 ## Open questions
 

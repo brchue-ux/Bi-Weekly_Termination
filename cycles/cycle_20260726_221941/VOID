@@ -1,0 +1,27 @@
+VOIDED as a closure baseline — 2026-07-26, by decision of the project owner.
+
+WHY: this cycle was an UNINTENDED live run. The command
+    python3 biweekly_recon.py --create-ticket
+was prefix-matched by argparse to the compat alias --create-tickets (apply=True), and the
+confirmation guard of the time read `if args.yes or not sys.stdin.isatty(): return` —
+treating "no terminal" as "no confirmation needed". A 2-minute timeout killed it mid-loop.
+
+WHAT IT DID: created 29 ServiceNow chains, REQ0010143-REQ0010171 / RITM0010132- /
+SCTASK0010190-, against dev336362. These duplicate the 30 chains from cycle_20260723_002630.
+The chains were deliberately LEFT IN PLACE (owner's decision): no further ServiceNow writes
+were made. Close or cancel them manually if/when desired; tickets.jsonl lists every
+correlation_id, REQ, RITM and SCTASK, and logs/20260727T021939Z-3160483.changes.jsonl holds
+all 116 mutating calls with full request/response bodies.
+
+EFFECT OF THIS FILE: scripts/biweekly_recon.py::load_prev_state skips any cycle directory
+containing a VOID file, so this run can never become the closure baseline. Without it, the
+next real cycle would age every finding here to 2 ("escalated"), report 0 new, and take its
+roster counts as the sanity-check reference.
+
+The evidence is retained, not deleted: the audit trail must show that this run happened and
+was excluded on purpose.
+
+FIXED SO IT CANNOT RECUR: all three write paths now fail CLOSED with no terminal (abort
+unless --yes is explicit), and every parser sets allow_abbrev=False so no partial flag is
+guessed into a live run. Regression tests:
+tests/test_safety_guards.py::NonInteractiveLiveRunIsRefused

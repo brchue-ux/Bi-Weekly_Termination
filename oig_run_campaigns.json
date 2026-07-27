@@ -1,0 +1,12 @@
+{
+ "live": {
+  "id": "ici11c29d1yN6cZo9697",
+  "name": "BiTerm \u2014 Access Certification (LIVE): NA Saturn ComSat",
+  "status": "ACTIVE"
+ },
+ "dormant": {
+  "id": "ici11c297d4rUoS5P697",
+  "name": "BiTerm \u2014 Access Certification (PREPARED): CloudForce HQ",
+  "status": "SCHEDULED"
+ }
+}

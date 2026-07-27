@@ -1,6 +1,174 @@
 # termination_revamp_v1
 
-## ⚠️ RESUME HERE — OIG rollout IN PROGRESS, halted mid-load 2026-07-24 (correctness stop)
+## 2026-07-26 (late) — Senior-review hardening pass: 8 blockers closed, shared layer, test suite
+
+Acted on every finding in `docs/CODE_REVIEW_2026-07-26.md`. Verified offline: 76 unit tests
+green + all 7 control-rule mutations caught (`python3 tests/run_tests.py`), all 42 scripts
+compile and import, and `load_rosters`/`load_exceptions`/`classify` reproduce the last recorded
+cycle exactly against the real workbooks (4,404 rows, 30 ticket findings, 475 unknowns —
+identical to cycle_20260723_163715; only `exception_expired` moves, 20→22, because the run date
+moved 07-23→07-26 and two more exceptions lapsed).
+
+### INCIDENT — 29 unintended ServiceNow ticket chains (self-inflicted, during this pass)
+
+A diagnostic command `python3 biweekly_recon.py --create-ticket` was prefix-matched by argparse
+to the compat alias `--create-tickets` (apply=True), and the newly written `confirm_apply()`
+read `if args.yes or not sys.stdin.isatty(): return` — treating "no terminal" as "no
+confirmation needed". It ran a full live cycle and created **29 chains (REQ0010143–REQ0010171 /
+RITM0010132– / SCTASK0010190–)** against PDI dev336362 before a 2-minute timeout killed it
+mid-loop. They duplicate the 30 chains from cycle_20260723_002630.
+`cycles/cycle_20260726_221941/` holds the complete record: `tickets.jsonl` (29 chains, fsynced
+per chain), `state.json` (`tickets_live: true`), and `logs/20260727T021939Z-3160483.changes.jsonl`
+(116 mutating calls with full request/response). **That cycle must not be used as a closure
+baseline** until it is voided or the duplicates are cancelled.
+
+Fixes shipped as a result: writes fail CLOSED with no terminal (abort unless `--yes` is
+explicit) on all three write paths; `allow_abbrev=False` on every parser. Regression tests:
+`tests/test_safety_guards.py::NonInteractiveLiveRunIsRefused`. The reason the damage is fully
+known is the crash-durability machinery built in this same pass — per-chain fsynced ledger,
+atomic state, change log — which captured every write.
+
+### Blockers closed
+
+1. **Fail-open resolution → fail-closed.** `okta_bookmark_sync.resolve_user` returned `None` for
+   429/500/503 exactly as for 404; `None` → not in `resolved` → into `to_remove` → DELETE under
+   `--apply`. A rate limit deprovisioned people. Now FOUND/NOT_FOUND/UNKNOWN, and one UNKNOWN
+   aborts before any write.
+2. **Blast-radius guard.** `run_all.guard_removals` refuses a removal set above
+   max(10, 10% of current) unless `--expect-removals N` matches exactly; identities are printed
+   first. An empty parse raises instead of meaning "remove everyone".
+3. **The `sheet1.xml` parser is gone** — `okta_bookmark_sync` uses `xlsx_min`, which resolves
+   sheets through `xl/_rels/workbook.xml.rels`. App assignments now paginate (was one page of
+   500; the comment admitted it).
+4. **Confirmation is exact.** `if typed not in org` accepted the single character "o" and the
+   empty string. Now `typed != hostname`, shown after the computed add/remove counts.
+5. **Ticket idempotency.** Deterministic `correlation_id = sha256(app|key|cls|first_cycle)` is
+   stamped on every RITM/SCTASK and queried in ServiceNow BEFORE ordering, so a re-run adopts
+   rather than duplicates — the answer survives losing state.json entirely. `tickets.jsonl` is
+   appended+fsynced per chain; `state.json` is written atomically before ticketing, every 25
+   chains, and at the end. A partial chain raises `PartialTicket` carrying what exists (exit
+   code 2) instead of collapsing to "SN-ERROR" and being silently re-ordered next cycle.
+6. **Expiries are real dates.** `domain.parse_date` handles ISO, unambiguous slash formats and
+   Excel serials, and REJECTS ambiguous D/M vs M/D rather than guessing. A malformed exception
+   register is fatal. Root cause was `xlsx_min` ignoring number formats: a date cell arrived as
+   "46023" and `"46023" < "2026-07-26"` is False, so lapsed exceptions silently passed.
+7. **Exception register read by HEADER NAME**, not `r.get(6)/r.get(7)/r.get(4)`.
+8. **Cycle evidence is tracked.** `.gitignore` no longer ignores the ledger; each cycle writes
+   `SHA256SUMS` + `evidence_manifest.json` over its inputs and outputs. `feed_ingest` selects the
+   exception register by cycle stamp (was `sorted(glob)[-1]`, so re-running an old cycle silently
+   used today's register).
+9. **Stable finding identity.** Findings key on the app-side account id, then employee id, then
+   UPN. Under the old `upn or alias:` key, an app owner backfilling an email — the goal of the
+   orphan-reduction workstream — read as a removal: a false "REMOVAL VERIFIED" work note plus a
+   duplicate finding. Prior state is still matched via `legacy_identity_key`, so the first cycle
+   after the change emits no wall of false closures.
+
+### Structural
+
+- **One HTTP client** (`biterm_http`): timeouts everywhere (exactly one `timeout=` existed in the
+  whole repo before), retry on 429/5xx + network errors with Retry-After/X-Rate-Limit-Reset then
+  jittered backoff, typed `OktaApiError`/`ServiceNowApiError`/`TransientError`/`AuthError`, and no
+  `SystemExit` from library code (that is what killed cycles after tickets existed but before
+  state was written). A paginated read that cannot finish RAISES — it used to `break` and return
+  a truncated map, which in the loader made already-correct principals look empty and triggered a
+  mass re-POST.
+- `biterm_config` / `biterm_domain` / `biterm_creds` / `biterm_runlog` / `oig_common` added;
+  `seed_tenant` no longer supplies the control's domain vocabulary.
+- `oig_common` holds the OIG derivation ONCE. The verifier's independence is now stated honestly:
+  it re-reads the tenant and re-derives from the drops, but it does not re-implement the logic —
+  copy-pasting it created two places to fix a bug and the illusion of a second opinion.
+- **The OIG dry run is a real plan** — current grants were only fetched under `--apply`, so a dry
+  run compared against `{}` and reported every principal as "granted".
+- A 401/5xx on the app read is no longer rendered as "emOptInStatus=None (enable EM in Console)";
+  an app silently dropping out of a compliance load is a coverage gap.
+- Unrankable roles raise instead of sorting as -1 (silently lowest privilege — the exact masking
+  highest-privilege-wins exists to prevent). Duplicate emails raise: last-wins left one principal
+  uncertified.
+- **Verifier: PASS / FAIL / INCONCLUSIVE**, and `--selftest` corrupts each of the six checks in
+  turn asserting PER APP (it corrupted one check and summed failures run-wide, so one app
+  emitting ten failures while nine emitted none still "passed").
+- **Campaign entitlement check is structural.** Was `"entitlement" in json.dumps(item).lower()`
+  over ≤20 sampled items — which an app-level item satisfies via `"entitlements": []`. Now every
+  item must carry a non-empty entitlement value AND the item count must equal the number of
+  principals holding a grant.
+- `logging` throughout with a run id; `logs/<run>.changes.jsonl` records every mutating call
+  (ts, run_id, actor, method, url, status, request, response) — the mutating scripts used to
+  leave no artifact at all.
+- `expires_in` is read from the token endpoint (was hardcoded 3600); long runs refresh instead of
+  401-ing mid-mutation. PyJWT imported lazily and declared in `requirements.txt`.
+- `argparse` everywhere with `allow_abbrev=False`; `--apply` is the standard write gate
+  (`--create-tickets` kept as a hidden alias). A typo'd flag is now an error — it used to silently
+  produce a DRY run, so an operator believed tickets were filed when none were.
+- Misc: sheet-name collisions de-duplicated; stage-task sweep paginates; unresolvable Okta
+  assignees keep their ids instead of collapsing to "?"; the Okta assignment leg is now reported
+  ("assigned in Okta, absent from this export") instead of computed and discarded; ServiceNow
+  tickets route to the assignment GROUP by default rather than a named individual.
+
+
+## 2026-07-26 — advisory: build-vs-native-vs-SCIM framing (for the leadership conversation)
+
+User asked whether any of this needs the dev team ("currently we just use a vlookup"), how much
+dev work it really is, and whether the same files extend once an app becomes SCIM-connected with
+real remediation. Answer captured as standing architecture in CLAUDE.md; summary:
+- **Not a dev-team backend build.** Campaign creation/launch = native Admin Console (scripts only
+  add repeatability). Reconciliation = analyst-owned (Power Query/Power BI or a small script),
+  the upgraded vlookup. The only "code" is the entitlement *loader*, needed only because the apps
+  are disconnected/CSV-fed.
+- **The loader is disposable scaffolding SCIM retires** app-by-app (a SCIM connector imports
+  accounts+entitlements natively → loader deleted per app, not extended). Automation footprint
+  SHRINKS over time, not grows.
+- **Same files carry to SCIM:** campaign runner reused ~verbatim — the only change is
+  `remediationSettings` NO_ACTION → actual deprovision, enforced by the connector, not new code.
+  Reconciliation unchanged by design (detective control keeps running, trends to zero). Verifier
+  reusable as a drift check. Loader is the one piece that goes away.
+- No-code alternative to the loader = Okta Workflows (low-code cards, admin-owned) — the same path
+  the user already rejected as 10× slower, so the small script stays the pragmatic interim.
+- Offered a one-page leadership summary; not yet built.
+
+## 2026-07-26 — OIG halted load RESOLVED; all 10 apps loaded + verified; live + dormant campaigns
+
+The 2026-07-24 correctness stop (below) is cleared. Design decision + rework + clean reload +
+independent verify + campaigns, all this session, on the disposable demo tenant.
+
+**Grant/entitlement mutability — probed live on NA Saturn Corp (decides everything):**
+- `PATCH`/`PUT` a grant's value → 400. Grants are immutable in place.
+- `DELETE /grants/{id}` → 400. Grants cannot be individually removed.
+- Flipping an entitlement's `multiValue` false→true → 400. Cannot change in place.
+- `DELETE` an entitlement → 204, but its grants do NOT cascade — they persist as *bare* grants
+  (app assignment intact, `entitlements: []`). `DELETE /apps/{id}/users/{uid}` → 204 but the
+  governance grant still persists. So there is no clean way to remove a grant via API.
+- **POSTing a grant for an existing principal with a different value REPLACES the value** (proven:
+  Standard User → then Administrator → grant shows only Administrator). This is the only lever.
+
+**Design decision: Option B+ — highest-privilege wins (single value).** Chosen because the replace
+semantics make it a clean, deletion-free correction, multiValue can't be flipped in place (and its
+multi-value capacity couldn't even be confirmed — a POST 502'd), and per-account detail already
+lives in the reconciliation per the two-control split. Priority: Administrator > Power User >
+Standard User > Read Only > Service Account. Privilege can never be hidden behind a lower role.
+
+**Loader reworked (`oig_load_all.py`):** aggregates every distinct role a person holds per app,
+grants the single highest; only re-POSTs when the current value ≠ the winner (idempotent). Applied
+run: err=0, granted=1069 (Corp repopulated + Stellar completed from its interrupted 240→1298),
+**corrected=37** conflicted principals whose first-row value wasn't the highest (Orion 22, Stellar
+12, HQ 2, Central 1), unchanged=2024, conflicted=136 total, orphan=431.
+
+**Verifier reworked (`oig_verify_all.py`):** checks the highest-privilege contract per PRINCIPAL,
+fixed the coverage math (was conflating principal-count with row-count → broke on every app with
+duplicate rows), reports un-deletable bare grants as WARN not FAIL, and added `--selftest` that
+injects a bogus role. `--selftest` → FAIL on all 10 (checker proven falsifiable). Real run →
+**VERDICT: PASS (10 apps, 0 failures)**, no bare-grant warnings.
+
+**Campaigns (`oig_run_campaigns.py`, NEW):** entitlement-level flags + AM-team reviewers (Zyler/
+Phil; never bchue@wm.com).
+- LIVE: `BiTerm — Access Certification (LIVE): NA Saturn ComSat` id `ici11c29d1yN6cZo9697` →
+  launched, **ACTIVE**. 20 review items = 20 grants, **0 lacking `entitlementValue`** (roles seen:
+  14 Standard User / 4 Read Only / 1 Power User / 1 Administrator). Landmine avoided.
+- DORMANT: `BiTerm — Access Certification (PREPARED): CloudForce HQ` id `ici11c297d4rUoS5P697` →
+  created only, **SCHEDULED** (start +365d), never launched. IDs in `oig_run_campaigns.json`.
+
+---
+
+## ⚠️ (RESOLVED — see above) RESUME HERE — OIG rollout IN PROGRESS, halted mid-load 2026-07-24 (correctness stop)
 
 **All 10 apps converted to SAML + EM enabled + entitlements created. Grant load was DELIBERATELY
 KILLED partway to fix a real defect. Do NOT just "finish the load" — the loader is wrong for
@@ -843,3 +1011,83 @@ which is precisely why the reconciliation is load-bearing in the CSV model and s
   app_onboarding_pattern_v1. Keep deprovisioning design in mind — parts resurface there.
 - What replaces the TalentHub status join once SailPoint is retired?
 - Is ServiceNow in scope (19 vs 18 apps)? Why is the DocuSign-schema file named SFDC?
+
+## End-to-end build lab written (2026-07-26)
+
+`docs/BITERM_END_TO_END_BUILD_LAB.md` — visual, module-by-module record of the whole build
+(data/re-identity → apps → users → Detective Control OAuth service → reconciliation →
+entitlements+grants → campaigns → revoke→ServiceNow closure loop → verification discipline),
+each module carrying BUILT / WHY THIS WAY / BENEFIT / ENTERPRISE-SAFE BECAUSE blocks and 7 mermaid
+diagrams. Complements (does not duplicate) `OIG_TERMINATION_LAB.md`, which is the click-by-click
+single-app how-to. State honestly tagged per module: grants shown as ⚠️ IN FLIGHT (2,072 partial,
+privilege-masking stop), all-apps campaigns as 📐 built-not-executed, Workflows as Console-only
+design + tested script reference. Doc only — no tenant or code changes.
+
+### Word edition (2026-07-26)
+
+Markdown edition judged hard to read as a document. Built `scripts/docx_write.py` — a
+dependency-free WordprocessingML writer (no python-docx/lxml/pip/pandoc in this environment;
+same hand-rolled-OOXML approach as xlsx_write.py) supporting headings, rich inline runs,
+banded tables, shaded left-accent callout panels, box-and-arrow figures, title page and a
+PAGE-field footer — plus `scripts/build_biterm_lab_docx.py` (content) →
+`docs/BiTerm_End_to_End_Build_Lab.docx` (~26 KB, 506 paragraphs, 59 tables). Mermaid diagrams
+re-expressed as native Word figures, so no image or rendering dependency.
+Validation harness caught two real defects pre-delivery: (1) `<w:contextualSpacing/>` emitted
+before `spacing`/`ind` — CT_PPr children are a validated SEQUENCE and Word rejects wrong order;
+(2) `**`code`**` left literal backticks because the bold branch didn't recurse. Both fixed;
+file now passes zip integrity, XML well-formedness on all 8 parts, 0 child-order violations,
+0 table row/gridCol mismatches, 0 leftover markup. NOT visually confirmed — no Word/LibreOffice
+on this box; user must eyeball it.
+
+### Doc tooling installed (2026-07-26)
+
+Word file copied to `~/Shares/Backups/` for Windows access (md5 matched after copy).
+Tooling: system python3 has no pip and is PEP-668 externally managed, but `ensurepip` works, so
+a venv was created at `~/.venvs/docs` with **python-docx 1.2.0, openpyxl 3.1.5, lxml 6.1.1**
+(no sudo needed). Used immediately as an INDEPENDENT consumer to re-verify the generated file:
+python-docx opened it cleanly — 59 tables, correct core title, Letter/0.75in margins, footer part
+present, all 15 module/appendix headings in order. That is third-party confirmation the
+hand-rolled OOXML is valid, replacing "my own validator says so".
+Pipeline scripts still run on system python and keep xlsx_min.py / docx_write.py — the venv is a
+verification + tooling environment, NOT a runtime dependency.
+STILL MISSING (needs sudo, user must run): libreoffice-writer for headless render→PDF, which is
+the only way to actually EYEBALL generated documents from here; pandoc optional.
+
+### Short editions + doc facts refreshed (2026-07-26)
+
+19-page Word edition judged too long. Built `scripts/docx_estimate.py` — an arithmetic paginator
+(no renderer on this box): it flows document.xml through the same font metrics docx_write.py
+emits and honours hard breaks. Calibrated against the known 19-page file, where it reports 20 —
+~5% conservative, so "estimate ≤ target" is the acceptance condition.
+`scripts/build_biterm_summaries_docx.py` → `docs/BiTerm_Build_Lab_6pager.docx` (page 1 contents,
+pages 2-6 substance, one hard break per page) and `docs/BiTerm_Build_Lab_1pager.docx`. Estimates:
+6 and 1. Three trim passes; facts kept, prose cut.
+`docx_write.py` gained `tail()`: a trailing table needs a following paragraph, but the standard
+~21pt spacer pushed the 1-pager onto a blank second page — tail() emits a 1pt paragraph instead.
+Wired into all three builders.
+**All three docs re-synced to the 2026-07-26 tenant state** (the grants section was written while
+the load was still halted): Module 6 now PROVEN with the mutability probe table + highest-privilege
+fix (1,069 granted / 37 corrected / PASS / --selftest falsifiable), Module 7 carries the LIVE
+ComSat + dormant CloudForce HQ campaigns and their IDs, gate table and Appendix A/B updated.
+Markdown edition updated to match. All three validated (zip, XML, 0 order violations, 0 table
+mismatches, 0 leftover markup) and opened cleanly by python-docx. Copied to ~/Shares/Backups/.
+Page counts remain ESTIMATES — no renderer here; install libreoffice-writer to confirm.
+
+### Page counts MEASURED, docs visually verified (2026-07-26)
+
+User installed libreoffice + pandoc, so the estimator was replaced with real measurement.
+**First render read 2 / 9 / 22 pages** — the estimator had been wrong by up to 3 pages (it can't
+model Word's breaks inside tables). Root cause of part of that gap: **no metric-compatible font** —
+Calibri fell back to Noto Sans (wider). Fixed without sudo: `apt-get download
+fonts-crosextra-carlito` + `dpkg-deb -x` into `~/.local/share/fonts`, plus a
+`~/.config/fontconfig/fonts.conf` rule mapping `Calibri Light`→Carlito. After that LO reports
+**1 / 6 / 19** — and 19 exactly matches the user's own Word page count for the full doc, which
+validates the render pipeline as a Word proxy.
+Both short docs therefore already met their targets; the earlier over-counts were rendering
+artifacts, not layout defects.
+**Two real visual defects found by actually looking at rasterized pages** (`pdftoppm` → view):
+(1) `fig_row`'s `▶` connector rendered as an orange tofu box — now `→`; (2) the 6-pager's reading
+key still carried an "IN FLIGHT" tile after the grant load was resolved — now a two-tile key.
+Both fixed, rebuilt, re-rendered, re-validated (0 order violations, 0 table mismatches, 0 leftover
+markup), and recopied to `~/Shares/Backups/`. `docx_estimate.py` docstring demoted to "smell test,
+never quote it"; the measure-don't-estimate workflow is now in CLAUDE.md.

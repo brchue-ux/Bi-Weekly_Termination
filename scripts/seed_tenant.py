@@ -26,30 +26,26 @@ import json
 import secrets
 import sys
 import time
-import urllib.error
 import urllib.parse
-import urllib.request
 from pathlib import Path
 
-from xlsx_min import load_workbook_rows
+import biterm_config
+import biterm_creds
+import biterm_http
+import biterm_runlog as runlog
+# Domain vocabulary lives in biterm_domain, not here. These names are re-exported for the
+# handful of modules that still import them from this file; new code imports biterm_domain.
+from biterm_domain import (APP_LABEL_PREFIX, NO_UPN, NO_UPN_SENTINEL, SFDC_APP,  # noqa: F401
+                           STARS_TABS, valid_login)
+from xlsx_min import column, column_by_suffix, find_header_row, load_workbook_rows
 
-ORG = "https://demo-beige-haddock-4684.okta.com"
-TOKEN_FILE = Path.home() / ".secrets" / "claude_3rd_party.txt"
-BASE = Path(__file__).parent.parent / "App User Lists"
-MANIFEST = Path(__file__).parent.parent / "seed_manifest.json"
-
-STARS_TABS = ["NA Apollo", "NA Stellar", "NA Orion", "NA Saturn East", "NA Saturn Central",
-              "NA Saturn West", "NA Saturn ComSat", "NA Saturn Corp", "CloudForce HQ", "CloudForce Canada"]
-SFDC_APP = "SFDC 3rd Party (DocuSign)"
-NO_UPN = "Not found in TalentHub"
-APP_LABEL_PREFIX = "BiTerm - "  # namespaces seeded apps away from pre-existing demo apps
+ORG = biterm_config.org()
+TOKEN_FILE = biterm_config.get("admin_token_file")
+BASE = Path(__file__).resolve().parent.parent / "App User Lists"
+MANIFEST = Path(__file__).resolve().parent.parent / "seed_manifest.json"
 
 
 # ---------------------------------------------------------------- plan building
-
-def valid_login(s: str) -> bool:
-    return "@" in s and " " not in s and s != NO_UPN.lower()
-
 
 def terminated_fate(login: str) -> str:
     """Deterministic split for Terminated/Retired identities."""
@@ -65,11 +61,12 @@ def build_plan():
     stars = load_workbook_rows(BASE / "FAKE USERS - STARS Report.xlsx")
     for tab in STARS_TABS:
         rows = stars[tab]
-        cols = {v: k for k, v in rows[1].items()}
-        upn_c, st_c = cols["TH_UPN"], cols["TH_EmployeeStatus"]
+        hdr_idx, headers = find_header_row(rows, ["TH_UPN", "TH_EmployeeStatus"], sheet_name=tab)
+        upn_c = column(headers, "TH_UPN", sheet_name=tab)
+        st_c = column(headers, "TH_EmployeeStatus", sheet_name=tab)
         label = APP_LABEL_PREFIX + tab
         apps[label], orphans[label] = [], 0
-        for r in rows[2:]:
+        for r in rows[hdr_idx + 1:]:
             if not any(str(v).strip() for v in r.values()):
                 continue
             login = (r.get(upn_c) or "").strip().lower()
@@ -83,11 +80,12 @@ def build_plan():
             apps[label].append(login)
 
     sfdc = load_workbook_rows(BASE / "FAKE USERS - SFDC 3rd party user list.xlsx")
-    rows = next(iter(sfdc.values()))
-    cols = {v: k for k, v in rows[0].items()}
-    em_c = cols["UserEmail"]  # FirstName/LastName are de-id scrambled: never import them
+    sfdc_tab, rows = next(iter(sfdc.items()))
+    hdr_idx, headers = find_header_row(rows, ["UserEmail"], sheet_name=sfdc_tab)
+    # FirstName/LastName are de-id scrambled: never import them
+    em_c = column(headers, "UserEmail", sheet_name=sfdc_tab)
     apps[SFDC_APP], orphans[SFDC_APP] = [], 0
-    for r in rows[1:]:
+    for r in rows[hdr_idx + 1:]:
         login = (r.get(em_c) or "").strip().lower()
         if not valid_login(login):
             orphans[SFDC_APP] += 1
@@ -108,44 +106,36 @@ def build_plan():
 
 # ---------------------------------------------------------------- okta client
 
+_client = None
+
+
+def client():
+    """Shared HTTP client (timeouts, retry ladder, typed errors, change log).
+
+    seed_tenant deliberately keeps the privileged SSWS token: it is scaffolding that
+    creates the demo tenant. The detective control runs under the least-privilege OAuth
+    service app and must never use this credential.
+    """
+    global _client
+    if _client is None:
+        _client = biterm_http.okta_client(
+            biterm_http.ssws(lambda: biterm_creds.api_token(TOKEN_FILE)),
+            on_write=runlog.change_recorder("seed_tenant", dry_run=False))
+    return _client
+
+
 def api(method, path, body=None, ok404=False):
-    """Single Okta call with 429 backoff. Returns parsed JSON (or None on 404 when ok404)."""
-    token = TOKEN_FILE.read_text().strip()
-    url = path if path.startswith("http") else ORG + path
-    for _ in range(6):
-        req = urllib.request.Request(url, method=method,
-                                     data=json.dumps(body).encode() if body is not None else None)
-        req.add_header("Authorization", f"SSWS {token}")
-        req.add_header("Accept", "application/json")
-        if body is not None:
-            req.add_header("Content-Type", "application/json")
-        try:
-            with urllib.request.urlopen(req) as resp:
-                data = resp.read()
-                return (json.loads(data) if data else {}), resp.headers
-        except urllib.error.HTTPError as e:
-            if e.code == 404 and ok404:
-                return None, e.headers
-            if e.code == 429:
-                reset = int(e.headers.get("X-Rate-Limit-Reset", time.time() + 30))
-                wait = max(reset - time.time(), 1) + 1
-                print(f"    429; sleeping {wait:.0f}s", file=sys.stderr)
-                time.sleep(wait)
-                continue
-            raise RuntimeError(f"{method} {path} -> {e.code}: {e.read().decode()[:300]}") from e
-    raise RuntimeError(f"{method} {path}: rate-limited past retries")
+    """Single Okta call. Returns (parsed JSON, headers); (None, headers) on 404 when ok404."""
+    status, parsed, headers = client().request(
+        method, path, body, allow_statuses=(404,) if ok404 else ())
+    if ok404 and status == 404:
+        return None, headers
+    return parsed, headers
 
 
 def paged(path):
     """Yield items across Okta link-header pagination."""
-    url = ORG + path
-    while url:
-        items, headers = api("GET", url)
-        yield from items
-        url = None
-        for link in headers.get_all("link") or []:
-            if 'rel="next"' in link:
-                url = link[link.index("<") + 1:link.index(">")]
+    yield from client().paged(path)
 
 
 # ---------------------------------------------------------------- execution
